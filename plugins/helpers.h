@@ -31,4 +31,10 @@ reco::Candidate::LorentzVector getVisMomentum(const std::vector<const reco::GenP
 reco::Candidate::LorentzVector getVisMomentum(const reco::GenParticle* genLeg, const reco::GenParticleCollection* genParticles);
 void findDaughters(const reco::GenParticle* mother, std::vector<const reco::GenParticle*>& daughters, int status);
 
+// ------------ help functions  ------------
+const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *particle);
+const reco::Candidate* findFirstMotherWithDifferentID(const reco::GenParticle *particle);
+const reco::Candidate* findOriginalMotherWithSameID(const reco::Candidate *particle);
+const reco::Candidate* findOriginalMotherWithSameID(const reco::GenParticle *particle);
+
 #endif

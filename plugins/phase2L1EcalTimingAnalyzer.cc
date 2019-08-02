@@ -15,6 +15,8 @@
 //
 //
 #include "phase2L1EcalTimingAnalyzer.h"
+#include <random>
+#define debug 0
 //#include "L1Trigger/phase2L1EcalTimingTP/plugins/phase2L1EcalTimingAnalyzer.h"
 //
 // constants, enums and typedefs
@@ -64,8 +66,10 @@ void phase2L1EcalTimingAnalyzer::loadEvent(const edm::Event& iEvent){
 
   if(!iEvent.getByToken(genTokenT_,genVertexTHandle))
     std::cout<<"No gen Particles T Found "<<std::endl;
-  else
+  else{
     std::cout<<"Gen Particles T value "<<*genVertexTHandle<<std::endl;
+    //genVertexT = *genVertexTHandle;
+  }
 
 }
 
@@ -200,6 +204,7 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
 void
 phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
   using namespace edm;
   //load event info
   loadEvent(iEvent);
@@ -208,32 +213,24 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   resetBranches();
 
   
- 
+  //event info
   runNum   = iEvent.id().run();
   lumiNum  = iEvent.id().luminosityBlock();
   eventNum = iEvent.id().event();
   
-/*
-  //edm::Handle< std::vector<L1CaloCluster> > l1Clusters;
-  //iEvent.getByToken( L1ClustersToken_, l1Clusters);
-  
-  //  edm::Handle< std::vector<L1PFObject> > l1PFChargedCandidates;
-  //  iEvent.getByToken( L1PFToken_, l1PFChargedCandidates);
-  
-
   edm::ESHandle<CaloGeometry> caloGeometryHandle;
   iSetup.get<CaloGeometryRecord>().get(caloGeometryHandle);
   const CaloGeometry* caloGeometry_ = caloGeometryHandle.product();  
   ebGeometry = caloGeometry_->getSubdetectorGeometry(DetId::Ecal, EcalBarrel);
 
+  //ecal barrel crystals
   for(auto& tpg : *ecaltpgCollection.product())
     {
  	nCrystals++; 
 
     //std::cout<<"Et " << tpg.encodedEt()<<std::endl;
     //std::cout<<"l1aSpike " << tpg.l1aSpike()<<std::endl;
-    //
-    if(tpg.time()!=0) {
+    if(tpg.time()!=0 && debug) {
 	std::cout<<"time " << tpg.time()<<std::endl;
 	std::cout<<"id " << tpg.id()<<std::endl;
 	//std::cout<<"id iEta " << tpg.id().ieta() << " iPhi " << tpg.id().iphi()<<std::endl;
@@ -241,7 +238,6 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	std::cout<<"approx Eta " << tpg.id().approxEta() <<std::endl;
 	std::cout<<"time above is not zero " <<std::endl;
      }
-
       if(tpg.encodedEt() > 0) 
       {
 
@@ -255,6 +251,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	      float eta = cell->getPosition().eta();
 	      float phi = cell->getPosition().phi();
 	      eb_Et[nCrystals-1] = et;
+	      //eb_time[nCrystals-1] = tpg.time();
 	      eb_time[nCrystals-1] = tpg.time();
 	      eb_ieta[nCrystals-1] = tpg.id().ieta();
 	      eb_iphi[nCrystals-1] = tpg.id().iphi();
@@ -268,120 +265,99 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	//std::cout<<"approx Eta " << tpg.id().approxEta() <<std::endl;
 	//std::cout<<"cell Eta " << eta << " Phi " << phi <<std::endl;
 	//std::cout<<"Et above is not zero " <<std::endl;
-		      }
+	}
     }
-
-
   // Get genParticles
   std::vector<reco::GenParticle> genPiZeros;
   std::vector<reco::GenParticle> genParticles;
-
-  nGenParticles = genParticleHandle->size();
+  
+  bool foundGenVertex = false;
   for(unsigned int i = 0; i< genParticleHandle->size(); i++){
+
     edm::Ptr<reco::GenParticle> ptr(genParticleHandle, i);
+    if(
+       (abs((ptr)->pdgId()) == 2212 ) //protons
+       || (abs((ptr)->pdgId()) >= 1 && abs((ptr)->pdgId()) <= 6 && ( (ptr)->status() < 30 )) //quarks
+       || (abs((ptr)->pdgId()) >= 11 && abs((ptr)->pdgId()) <= 16) //leptons
+       || (abs((ptr)->pdgId()) == 21 && (ptr)->status() < 30) //gluons
+       || (abs((ptr)->pdgId()) >= 22 && abs((ptr)->pdgId()) <= 25 && ( (ptr)->status() < 30)) //gammas, z0, w, higgs
+       || (abs((ptr)->pdgId()) >= 32 && abs((ptr)->pdgId()) <= 42) // other gauge and higgs bosons
+       || (abs((ptr)->pdgId()) == 111 && abs((ptr)->pdgId()) == 211) // pi0 or pi+ pi-
+       || (abs((ptr)->pdgId()) == 311 && abs((ptr)->pdgId()) == 321) // k0 or k+ k-
+       || (abs((ptr)->pdgId()) == 130 && abs((ptr)->pdgId()) == 310) // k0l or k0s
+       || (abs((ptr)->pdgId()) >= 1000001 && abs((ptr)->pdgId()) <= 1000039) //susy particles
+       || (abs((ptr)->pdgId()) == 9000006 || abs((ptr)->pdgId()) == 9000007) //llp
+     ){
     genParticles.push_back(*ptr);
- 
-    //gParticleMotherId[i] = ptr->mother(0)->pdgId();
-
-    gParticleId[i] = ptr->pdgId();
-    if(i==0)std::cout<<"Gen Particles Id "<<gParticleId[i]<<std::endl;
-    gParticleStatus[i] = ptr->status();
-
-    gParticleE[i] = ptr->energy();
-    gParticlePt[i] = ptr->pt();
-    gParticlePx[i] = ptr->px();
-    gParticlePy[i] = ptr->py();
-    gParticlePz[i] = ptr->pz();
-    gParticleEta[i] = ptr->eta();
-    gParticlePhi[i] = ptr->phi();
-
-    gParticle_decay_vtx_x[i] = ptr->vx();
-    gParticle_decay_vtx_y[i] = ptr->vy();
-    gParticle_decay_vtx_z[i] = ptr->vz();
-
-    if(abs(ptr->pdgId())==111 && abs(ptr->eta()<1.5)){
-      genPiZeros.push_back(*ptr);
-      //std::cout<<"Found PiZero PDGID 111 pt: "<<ptr->pt()<<" eta: "<<ptr->eta()<<" phi: "<<ptr->phi()<<std::endl;
-      //std::cout<<"Found PiZero PDGID 111 status: "<<ptr->status()<<" vx: "<<ptr->vx()<<" vy: "<<ptr->vy()<<" vz: "<<ptr->vz()<<std::endl;
-      //std::cout<<"Found PiZero PDGID 111 daughter num: "<<ptr->numberOfDaughters()<<" mother num: "<<ptr->numberOfMothers()<<std::endl;
-      //const reco::Candidate *dau0 = ptr->mother(0);
-      int num = ptr->numberOfMothers();
-
-      for(int ntr = 0; ntr < num; ntr++){
-	const reco::Candidate *mo = ptr->mother(ntr);
-      int num1 = mo->numberOfMothers();
-	if(abs(mo->pdgId())==2212)
-      		std::cout<<"Found PiZero from proton mo"<<std::endl;
-      	for(int ntr1 = 0; ntr1 < num1; ntr1++){
-		
-	const reco::Candidate *mo1 = mo->mother(ntr1);
-      int num2 = mo1->numberOfMothers();
-	if(abs(mo1->pdgId())==2212)
-      		std::cout<<"Found PiZero from proton mo1"<<std::endl;
-      	for(int ntr2 = 0; ntr2 < num2; ntr2++){
-		
-	const reco::Candidate *mo2 = mo1->mother(ntr2);
-      int num3 = mo2->numberOfMothers();
-	if(abs(mo2->pdgId())==2212)
-      		std::cout<<"Found PiZero from proton mo2"<<std::endl;
-      	for(int ntr3 = 0; ntr3 < num3; ntr3++){
-		
-	const reco::Candidate *mo3 = mo2->mother(ntr3);
-      int num4 = mo3->numberOfMothers();
-	if(abs(mo3->pdgId())==2212)
-      		std::cout<<"Found PiZero from proton mo3"<<std::endl;
-      	for(int ntr4 = 0; ntr4 < num4; ntr4++){
-		
-	const reco::Candidate *mo4 = mo3->mother(ntr4);
-      int num5 = mo4->numberOfMothers();
-	if(abs(mo4->pdgId())==2212)
-      		std::cout<<"Found PiZero from proton mo4"<<std::endl;
-      	for(int ntr5 = 0; ntr5 < num5; ntr5++){
-		
-	const reco::Candidate *mo5 = mo4->mother(ntr4);
-      int num6 = mo5->numberOfMothers();
-	if(abs(mo5->pdgId())==2212)
-      		std::cout<<"Found PiZero from proton mo5"<<std::endl;
-	}
-	}
-	}
-	}
-	}
-		
-      }
-
-      if(ptr->mother(0) )std::cout<<"Found PiZero PDGID 111 mother id: "<<ptr->mother(0)->pdgId()<<std::endl;
-      if(ptr->mother(0)->mother(0) )std::cout<<"Found PiZero PDGID 111 grand mother id: "<<ptr->mother(0)->mother(0)->pdgId()<<std::endl;
-      if(ptr->mother(0)->mother(0)->mother(0) )std::cout<<"Found PiZero PDGID 111 great grand mother id: "<<ptr->mother(0)->mother(0)->mother(0)->pdgId()<<std::endl;
-
-      if(ptr->mother(0) )std::cout<<"Found PiZero PDGID 111 mother num: "<<ptr->numberOfMothers()<<std::endl;
-      if(ptr->mother(0)->mother(0) )std::cout<<"Found PiZero PDGID 111 grand mother num: "<<ptr->mother(0)->numberOfMothers()<<std::endl;
-      if(ptr->mother(0)->mother(0)->mother(0) )std::cout<<"Found PiZero PDGID 111 great grand mother num: "<<ptr->mother(0)->mother(0)->numberOfMothers()<<std::endl;
-      //std::cout<<"Found PiZero PDGID 111 flag Photon: "<<ptr->isPhoton()<<std::endl;
-      
-      if(ptr->numberOfDaughters()==2){
-      std::cout<<"Found PiZero PDGID 111 flag daughter 0 id: "<<ptr->daughter(0)->pdgId()<<std::endl;
-      std::cout<<"Found PiZero PDGID 111 flag daughter 1 id: "<<ptr->daughter(1)->pdgId()<<std::endl;
-      const reco::Candidate *dau0 = ptr->daughter(0);
-      const reco::Candidate *dau1 = ptr->daughter(1);
-      std::cout<<"Found PiZero dau0: "<<" vx: "<<dau0->vx()<<" vy: "<<dau0->vy()<<" vz: "<<dau0->vz()<<std::endl;
-      std::cout<<"Found PiZero dau0: "<<" pt: "<<dau0->pt()<<" eta: "<<dau0->eta()<<" phi: "<<dau0->phi()<<std::endl;
-      std::cout<<"Found PiZero dau1: "<<" vx: "<<dau1->vx()<<" vy: "<<dau1->vy()<<" vz: "<<dau1->vz()<<std::endl;
-      std::cout<<"Found PiZero dau1: "<<" pt: "<<dau1->pt()<<" eta: "<<dau1->eta()<<" phi: "<<dau1->phi()<<std::endl;
-      }
-
-    }//genPiZero
-
-    if(abs(ptr->pdgId())==2212 && abs(ptr->eta()<1.5)){
-      //genPiPluss.push_back(*ptr);
-      std::cout<<"Found proton PDGID 2212 pt: "<<ptr->pt()<<" eta: "<<ptr->eta()<<" phi: "<<ptr->phi()<<std::endl;
-      std::cout<<"Found proton PDGID 2212 status: "<<ptr->status()<<" vx: "<<ptr->vx()<<" vy: "<<ptr->vy()<<" vz: "<<ptr->vz()<<std::endl;
     }
 
-  }
-  ecalTPTree->Fill();
+    int num = ptr->numberOfDaughters();
+    if (!foundGenVertex)
+    {
+      for (int j=0; j< num; ++j)
+      {
+        const reco::Candidate *dau = ptr->daughter(j);
+        if (dau)
+        {
+          genVertexX = dau->vx();
+	  //std::cout<<"vx " << dau->vx() << " genVertexX " << genVertexX <<std::endl;
+          genVertexY = dau->vy();
+          genVertexZ = dau->vz();
+          foundGenVertex = true;
+          break;
+        }
+      }
+    }//find genvertex
+ 
 
-*/   
+  }
+
+  genVertexT = *genVertexTHandle;
+
+  //fill gen info
+  nGenParticles = genParticles.size();
+ 
+  for(unsigned int i = 0; i< genParticles.size(); i++){
+    reco::GenParticle gen = genParticles[i];
+
+    gParticleId[i] = gen.pdgId();
+    gParticleStatus[i] = gen.status();
+
+    gParticleE[i] = gen.energy();
+    gParticlePt[i] = gen.pt();
+    gParticlePx[i] = gen.px();
+    gParticlePy[i] = gen.py();
+    gParticlePz[i] = gen.pz();
+    gParticleEta[i] = gen.eta();
+    gParticlePhi[i] = gen.phi();
+
+    gParticle_decay_vtx_x[i] = gen.vx();
+    gParticle_decay_vtx_y[i] = gen.vy();
+    gParticle_decay_vtx_z[i] = gen.vz();
+
+    // gen mother
+    if(gen.numberOfMothers() > 0){
+	const reco::Candidate* firstMotherWithDifferentID = findFirstMotherWithDifferentID(&gen);
+        if (firstMotherWithDifferentID)
+        {
+        	gParticleMotherId[i] = firstMotherWithDifferentID->pdgId();
+        }
+
+	//find the mother and keep going up the mother chain if the ID's are the same
+	const reco::Candidate* originalMotherWithSameID = findOriginalMotherWithSameID(&gen);
+	for(unsigned int j = 0; j < genParticles.size(); j++)
+	{
+		if(gen.pdgId() == originalMotherWithSameID->pdgId() )
+		{
+			gParticleMotherIndex[i] = j;
+			break;
+		}
+	}
+     }// finish gen mother
+
+  }//loop of gen
+
+  ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;
 }
 
