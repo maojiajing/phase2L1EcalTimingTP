@@ -5,6 +5,7 @@ L1EcalTimingAnalyzer = cms.EDAnalyzer('phase2L1EcalTimingAnalyzer',
                                l1TauObjects     = cms.InputTag("L1PFTauProducer","L1PFTaus"),
                                L1TrackInputTag  = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),            
                                genParticles     = cms.InputTag("genParticles", "", "HLT"),
+                               genParticles_t0     = cms.InputTag("genParticles", "t0", "HLT"),
                                packedCandidates = cms.InputTag("packedPFCandidates","","RECO"),
                                ecalTPGsBarrel = cms.InputTag("simEcalEBTriggerPrimitiveDigis","","HLT"),
                                miniTaus         = cms.InputTag("slimmedTaus", "", "RECO")
