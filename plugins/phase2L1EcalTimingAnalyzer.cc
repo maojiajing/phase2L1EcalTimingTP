@@ -252,7 +252,13 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	      float phi = cell->getPosition().phi();
 	      eb_Et[nCrystals-1] = et;
 	      //eb_time[nCrystals-1] = tpg.time();
-	      eb_time[nCrystals-1] = tpg.time();
+	      float sigma_t = pow(et,-0.34242268082)*0.121; //similar to eta=0 lumi 300/fb
+	      std::random_device rd;
+	      std::default_random_engine generator;
+              std::normal_distribution<float> distribution(0,sigma_t);
+              eb_time[nCrystals-1] = distribution(generator);  // generates number
+	      //std::cout<<"dice " << eb_time[nCrystals-1] <<std::endl;
+	      //float sigma_t = TMath::pow(et,-0.34242268082)*0.121;
 	      eb_ieta[nCrystals-1] = tpg.id().ieta();
 	      eb_iphi[nCrystals-1] = tpg.id().iphi();
 	      eb_ism[nCrystals-1] = tpg.id().ism();
