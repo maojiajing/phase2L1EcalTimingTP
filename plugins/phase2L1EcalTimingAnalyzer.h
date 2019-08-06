@@ -152,6 +152,7 @@ private:
 
  float eb_Et[EBCRYSTALARRAYSIZE];
  float eb_time[EBCRYSTALARRAYSIZE];
+ int eb_id[EBCRYSTALARRAYSIZE];
  int eb_ieta[EBCRYSTALARRAYSIZE];
  int eb_iphi[EBCRYSTALARRAYSIZE];
  int eb_ism[EBCRYSTALARRAYSIZE];
@@ -185,5 +186,8 @@ private:
  float gParticle_decay_vtx_y[GENPARTICLEARRAYSIZE];
  float gParticle_decay_vtx_z[GENPARTICLEARRAYSIZE];
 
+ float gE10x10[GENPARTICLEARRAYSIZE];
+ float gE5x5[GENPARTICLEARRAYSIZE];
+ float gE3x3[GENPARTICLEARRAYSIZE];
 };
 

@@ -285,3 +285,100 @@ const reco::Candidate* findOriginalMotherWithSameID(const reco::GenParticle *par
   return 0;
 }
 
+////conversion between DetId <-> ieta/ix/iphi/iy
+
+int detID_from_iEtaiPhi(int iEta_or_iX=1, int iPhi_or_iY=1, bool isEB = true, bool isEEMinus = false)
+{
+	uint32_t detID = 0;
+	int Ecal = 3;
+	int EcalBarrel=1;
+	int EcalEndcap=2;
+	int iz = isEEMinus?-1:1;
+
+	if(isEB) 
+	{
+		detID = ((Ecal&0xF)<<28)|((EcalBarrel&0x7)<<25);
+		detID |= ((iEta_or_iX>0)?(0x10000|(iEta_or_iX<<9)):((-iEta_or_iX)<<9))|(iPhi_or_iY&0x1FF);
+	}
+	else
+	{
+		detID = ((Ecal&0xF)<<28)|((EcalEndcap&0x7)<<25);
+		
+		detID |=(iPhi_or_iY&0x7f)|((iEta_or_iX&0x7f)<<7)|((iz>0)?(0x4000):(0));
+	}
+
+	return int(detID);	
+};
+
+
+int iEta_or_iX_from_detID(int detID=1, bool isEB = true)
+{
+	int iEta_or_iX = 0;
+	uint32_t id_ = uint32_t(detID);
+	if(isEB)
+	{
+		int zside = (id_&0x10000)?(1):(-1);
+		int ietaAbs = (id_>>9)&0x7F;
+		iEta_or_iX =  zside*ietaAbs;
+	}
+	else
+	{
+		iEta_or_iX = (id_>>7)&0x7F;
+	}
+	return iEta_or_iX;
+	
+};
+
+int iPhi_or_iY_from_detID(int detID=1, bool isEB = true)
+{
+	int iPhi_or_iY = 0;
+	uint32_t id_ = uint32_t(detID);
+	if(isEB)
+	{
+		iPhi_or_iY =  id_&0x1FF;
+	}
+	else
+	{
+		iPhi_or_iY = id_&0x7F;
+	}
+	return iPhi_or_iY;
+};
+
+int eta_to_iEta(float eta){
+	float unit = 2*TMath::Pi()/360;
+	float ieta = eta/unit;
+	int iEta = 1;
+	if(ieta >= 0){
+		if(abs(ieta-int(ieta)) <= abs(ieta-int(ieta)-1)){
+			iEta = int(ieta);
+		}
+		else{
+			iEta = int(ieta)+1;
+		} 
+	}
+	else{
+		if(abs(ieta-int(ieta)) <= abs(ieta-int(ieta)+1)){
+			iEta = int(ieta);
+		}
+		else{
+			iEta = int(ieta)-1;
+		} 
+	}
+	return iEta;
+};
+
+float iEta_to_eta(int iEta){
+	float unit = 2*TMath::Pi()/360;
+	float eta = iEta*unit;
+	return eta;
+};
+
+float Et_to_E(float Et, int ieta){
+	float E = 0.;
+	float theta = 0.;
+	float eta = iEta_to_eta(ieta);
+	theta = 2*TMath::ATan(exp(-eta));
+	E = Et/sin(theta);
+  	std::cout<< " iEta " << ieta  << " Et " << Et <<" E " << E << " theta " << theta <<std::endl;
+	return E;
+};
