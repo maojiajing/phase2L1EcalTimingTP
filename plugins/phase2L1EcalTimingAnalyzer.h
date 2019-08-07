@@ -204,6 +204,7 @@ private:
  float gParticleMotherPz[GENPARTICLEARRAYSIZE];
  float gParticleMotherEta[GENPARTICLEARRAYSIZE];
  float gParticleMotherPhi[GENPARTICLEARRAYSIZE];
+ float gParticleMotherDR[GENPARTICLEARRAYSIZE];
 
  float gParticleSiblingE[GENPARTICLEARRAYSIZE];
  float gParticleSiblingPt[GENPARTICLEARRAYSIZE];
@@ -212,6 +213,7 @@ private:
  float gParticleSiblingPz[GENPARTICLEARRAYSIZE];
  float gParticleSiblingEta[GENPARTICLEARRAYSIZE];
  float gParticleSiblingPhi[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingDR[GENPARTICLEARRAYSIZE];
 
 };
 
