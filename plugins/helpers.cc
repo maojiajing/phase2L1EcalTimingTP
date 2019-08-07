@@ -197,7 +197,7 @@ void findDaughters(const reco::GenParticle* mother, std::vector<const reco::GenP
   }
 }
 
-const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *particle){
+const reco::Candidate *findFirstMotherWithDifferentID(const reco::Candidate *particle){
 
   if( particle == 0 ){
     printf("ERROR! null candidate pointer, this should never happen\n");
@@ -219,7 +219,7 @@ const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *par
   return 0;
 };
 
-const reco::Candidate* findFirstMotherWithDifferentID(const reco::GenParticle *particle){
+const reco::Candidate *findFirstMotherWithDifferentID(const reco::GenParticle *particle){
 
   if( particle == 0 ){
     printf("ERROR! null candidate pointer, this should never happen\n");
@@ -241,7 +241,7 @@ const reco::Candidate* findFirstMotherWithDifferentID(const reco::GenParticle *p
   return 0;
 };
 
-const reco::Candidate* findOriginalMotherWithSameID(const reco::Candidate *particle){
+const reco::Candidate *findOriginalMotherWithSameID(const reco::Candidate *particle){
 
   if( particle == 0 ){
     printf("ERROR! null candidate pointer, this should never happen\n");
@@ -263,7 +263,7 @@ const reco::Candidate* findOriginalMotherWithSameID(const reco::Candidate *parti
   return 0;
 }
 
-const reco::Candidate* findOriginalMotherWithSameID(const reco::GenParticle *particle){
+const reco::Candidate *findOriginalMotherWithSameID(const reco::GenParticle *particle){
 
   if( particle == 0 ){
     printf("ERROR! null candidate pointer, this should never happen\n");

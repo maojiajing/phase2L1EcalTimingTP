@@ -61,13 +61,14 @@ void phase2L1EcalTimingAnalyzer::loadEvent(const edm::Event& iEvent){
 
   if(!iEvent.getByToken(genToken_,genParticleHandle))
     std::cout<<"No gen Particles Found "<<std::endl;
-  else
-    std::cout<<"Gen Particles size "<<genParticleHandle->size()<<std::endl;
-
+  else{
+    //std::cout<<"Gen Particles size "<<genParticleHandle->size()<<std::endl;
+  }
+	
   if(!iEvent.getByToken(genTokenT_,genVertexTHandle))
     std::cout<<"No gen Particles T Found "<<std::endl;
   else{
-    std::cout<<"Gen Particles T value "<<*genVertexTHandle<<std::endl;
+    //std::cout<<"Gen Particles T value "<<*genVertexTHandle<<std::endl;
     //genVertexT = *genVertexTHandle;
   }
 
@@ -114,6 +115,9 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gParticleMotherId", &gParticleMotherId, "gParticleMotherId[nGenParticles]/I");
  ecalTPTree->Branch("gParticleMotherIndex", &gParticleMotherIndex, "gParticleMotherIndex[nGenParticles]/I");
 
+ ecalTPTree->Branch("gParticleSiblingId", &gParticleSiblingId, "gParticleSiblingId[nGenParticles]/I");
+ ecalTPTree->Branch("gParticleSiblingIndex", &gParticleSiblingIndex, "gParticleSiblingIndex[nGenParticles]/I");
+
  ecalTPTree->Branch("gParticleId", &gParticleId, "gParticleId[nGenParticles]/I");
  ecalTPTree->Branch("gParticleStatus", &gParticleStatus, "gParticleStatus[nGenParticles]/I");
 
@@ -132,6 +136,23 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gE10x10", &gE10x10, "gE10x10[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5", &gE5x5, "gE5x5[nGenParticles]/F");
  ecalTPTree->Branch("gE3x3", &gE3x3, "gE3x3[nGenParticles]/F");
+
+ ecalTPTree->Branch("gParticleMotherE", &gParticleMotherE, "gParticleMother[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleMotherPt", &gParticleMotherPt, "gParticleMotherPt[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleMotherPx", &gParticleMotherPx, "gParticleMotherPx[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleMotherPy", &gParticleMotherPy, "gParticleMotherPy[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleMotherPz", &gParticleMotherPz, "gParticleMotherPz[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleMotherEta", &gParticleMotherEta, "gParticleMotherEta[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleMotherPhi", &gParticleMotherPhi, "gParticleMotherPhi[nGenParticles]/F");
+
+ ecalTPTree->Branch("gParticleSiblingE", &gParticleSiblingE, "gParticleSiblingE[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleSiblingPt", &gParticleSiblingPt, "gParticleSiblingPt[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleSiblingPx", &gParticleSiblingPx, "gParticleSiblingPx[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleSiblingPy", &gParticleSiblingPy, "gParticleSiblingPy[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleSiblingPz", &gParticleSiblingPz, "gParticleSiblingPz[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleSiblingEta", &gParticleSiblingEta, "gParticleSiblingEta[nGenParticles]/F");
+ ecalTPTree->Branch("gParticleSiblingPhi", &gParticleSiblingPhi, "gParticleSiblingPhi[nGenParticles]/F");
+
 };
 
 // ------------ reset branches  ------------
@@ -178,6 +199,9 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  gParticleMotherId[i]     = -666;
  gParticleMotherIndex[i]  = -666;
 
+ gParticleSiblingId[i]     = -666;
+ gParticleSiblingIndex[i]  = -666;
+
  gParticleId[i]           = -666;
  gParticleStatus[i]       = -666;
 
@@ -196,6 +220,24 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  gE10x10[i] = -666.;
  gE5x5[i] = -666.;
  gE3x3[i] = -666.;
+
+ gParticleMotherE[i]            = -666.;
+ gParticleMotherPt[i]           = -666.;
+ gParticleMotherPx[i]           = -666.;
+ gParticleMotherPy[i]           = -666.;
+ gParticleMotherPz[i]           = -666.;
+ gParticleMotherEta[i]          = -666.;
+ gParticleMotherPhi[i]          = -666.;
+
+ gParticleSiblingE[i]            = -666.;
+ gParticleSiblingPt[i]           = -666.;
+ gParticleSiblingPx[i]           = -666.;
+ gParticleSiblingPy[i]           = -666.;
+ gParticleSiblingPz[i]           = -666.;
+ gParticleSiblingEta[i]          = -666.;
+ gParticleSiblingPhi[i]          = -666.;
+
+
  }
 
 };
@@ -340,9 +382,9 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
        || (abs((ptr)->pdgId()) == 21 && (ptr)->status() < 30) //gluons
        || (abs((ptr)->pdgId()) >= 22 && abs((ptr)->pdgId()) <= 25 && ( (ptr)->status() < 30)) //gammas, z0, w, higgs
        || (abs((ptr)->pdgId()) >= 32 && abs((ptr)->pdgId()) <= 42) // other gauge and higgs bosons
-       || (abs((ptr)->pdgId()) == 111 && abs((ptr)->pdgId()) == 211) // pi0 or pi+ pi-
-       || (abs((ptr)->pdgId()) == 311 && abs((ptr)->pdgId()) == 321) // k0 or k+ k-
-       || (abs((ptr)->pdgId()) == 130 && abs((ptr)->pdgId()) == 310) // k0l or k0s
+       || (abs((ptr)->pdgId()) == 111 || abs((ptr)->pdgId()) == 211) // pi0 or pi+ pi-
+       || (abs((ptr)->pdgId()) == 311 || abs((ptr)->pdgId()) == 321) // k0 or k+ k-
+       || (abs((ptr)->pdgId()) == 130 || abs((ptr)->pdgId()) == 310) // k0l or k0s
        || (abs((ptr)->pdgId()) >= 1000001 && abs((ptr)->pdgId()) <= 1000039) //susy particles
        || (abs((ptr)->pdgId()) == 9000006 || abs((ptr)->pdgId()) == 9000007) //llp
      ){
@@ -395,28 +437,68 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 
     // gen mother
     if(gen.numberOfMothers() > 0){
-	const reco::Candidate* firstMotherWithDifferentID = findFirstMotherWithDifferentID(&gen);
+	const reco::Candidate *firstMotherWithDifferentID = findFirstMotherWithDifferentID(&gen);
         if (firstMotherWithDifferentID)
         {
         	gParticleMotherId[i] = firstMotherWithDifferentID->pdgId();
         }
 
 	//find the mother and keep going up the mother chain if the ID's are the same
-	const reco::Candidate* originalMotherWithSameID = findOriginalMotherWithSameID(&gen);
+	const reco::Candidate *originalMotherWithSameID = findOriginalMotherWithSameID(&gen);
 	for(unsigned int j = 0; j < genParticles.size(); j++)
 	{
-		if(gen.pdgId() == originalMotherWithSameID->pdgId() )
+		//std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i] << " origin mather id  " << originalMotherWithSameID->pdgId() << " test id " << genParticles[j].pdgId() 
+		//<< " pointer &i "  << &gen << " &o " << &originalMotherWithSameID << " &j " << &(genParticles[j]) 
+		//<< " o  " << originalMotherWithSameID << " j " << genParticles[j] 
+		//<< " *j " << *genParticles[j] 
+		//<< " *o " << *originalMotherWithSameID 
+		//<<std::endl;
+		if(genParticles[j].pdgId() == originalMotherWithSameID->pdgId() && genParticles[j].energy() == originalMotherWithSameID->energy() && genParticles[j].eta() ==originalMotherWithSameID->eta() && genParticles[j].phi() == originalMotherWithSameID->phi() && genParticles[j].pt() == originalMotherWithSameID->pt() && genParticles[j].px() == originalMotherWithSameID->px() )
 		{
+			//std::cout<<" find "<<std::endl;
+
 			gParticleMotherIndex[i] = j;
 			break;
 		}
 	}
+
      }// finish gen mother
 
     //pi0 and Egammas in ecal barrel
     //if( (abs(gen.pdgId())==111 || abs(gen.pdgId())==22 || abs(gen.pdgId())==11) && abs(gen.eta()) < 1.5 ){
     //if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && gen.pt()>50 && abs(gen.eta()) < 1.5 ){
+    //
+    //gammas in ecal barrel
     if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && abs(gen.eta()) < 1.5 ){
+/*
+	//mother info
+	int mo = gParticleMotherIndex[i];
+	if(mo!=-666){
+    		reco::GenParticle mother = genParticles[mo];
+
+        	gParticleMotherE[i] = mother.energy();
+        	gParticleMotherPt[i] = mother.pt();
+        	gParticleMotherPx[i] = mother.px();
+        	gParticleMotherPy[i] = mother.py();
+        	gParticleMotherPz[i] = mother.pz();
+        	gParticleMotherEta[i] = mother.eta();
+        	gParticleMotherPhi[i] = mother.phi();
+	}
+	
+	//sibling info
+	int si = gParticleSiblingIndex[i];
+	if(si!=-666){
+    		reco::GenParticle sibling = genParticles[si];
+
+        	gParticleSiblingE[i] = sibling.energy();
+        	gParticleSiblingPt[i] = sibling.pt();
+        	gParticleSiblingPx[i] = sibling.px();
+        	gParticleSiblingPy[i] = sibling.py();
+        	gParticleSiblingPz[i] = sibling.pz();
+        	gParticleSiblingEta[i] = sibling.eta();
+        	gParticleSiblingPhi[i] = sibling.phi();
+	}
+*/
 	//conversion between ieta, iphi and detID
 	int iEta = 1;
 	int iPhi = 1;
@@ -427,20 +509,13 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	float eta = etaphi[0];
 	float phi = etaphi[1];
 
-	//iEta = eta_to_iEta(gen.eta());
-	//iPhi = eta_to_iEta(gen.phi());
 	iEta = eta_to_iEta(eta);
 	iPhi = eta_to_iEta(phi);
 
 	int id = detID_from_iEtaiPhi(iEta, iPhi, true, false);
-/*
-	int idmin1 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
-	int idmin2 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
-	int idmax1 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
-	int idmax2 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
-*/
-	std::cout<<" Particle GEN Eta " << gen.eta() << " Phi " << gen.phi() << " ieta " << gen.eta()/unit << " iphi " << gen.phi()/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
-	std::cout<<" Particle CORR Eta " << eta << " Phi " << phi << " ieta " << eta/unit << " iphi " << phi/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
+
+	//std::cout<<" Particle GEN Eta " << gen.eta() << " Phi " << gen.phi() << " ieta " << gen.eta()/unit << " iphi " << gen.phi()/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
+	//std::cout<<" Particle CORR Eta " << eta << " Phi " << phi << " ieta " << eta/unit << " iphi " << phi/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
 
 	float Edep10x10 = 0.;
 	float Edep5x5 = 0.;
@@ -488,10 +563,34 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	gE5x5[i] = Edep5x5;
 	gE3x3[i] = Edep3x3;
 
-	std::cout<<"Eta " << gen.eta() << " Phi " << gen.phi() <<  " iEta " << iEta << " iPhi " << iPhi << " E " << gen.energy()  << " Pt " << gen.pt() << " Edep 10x10 " << Edep10x10 << " Edep 5x5 " << Edep5x5 << " Edep3x3 " << Edep3x3  <<std::endl;
+	//std::cout<<"Eta " << gen.eta() << " Phi " << gen.phi() <<  " iEta " << iEta << " iPhi " << iPhi << " E " << gen.energy()  << " Pt " << gen.pt() << " Edep 10x10 " << Edep10x10 << " Edep 5x5 " << Edep5x5 << " Edep3x3 " << Edep3x3  <<std::endl;
     }//photons 
 
   }//loop of gen
+
+  for(unsigned int i = 0; i< genParticles.size(); i++){
+	  reco::GenParticle gen = genParticles[i];
+	  int k1 = gParticleMotherIndex[i];
+	  float mindr = 0.;
+
+	  for(unsigned int p = 0; p < genParticles.size(); p++)
+	  {	
+		//if(p==i) break;
+	  	int k2 = gParticleMotherIndex[p];
+
+		float dr = deltaR(gParticleEta[i], gParticlePhi[i], gParticleEta[p], gParticlePhi[p]);
+		if(p!=i && k1==k2){
+// && gParticleId[p] == 22 && gParticleId[i] == 22  && gParticleMotherId[i]==111 && gParticleMotherId[p]==111  && (genParticles[k1].numberOfDaughters()) == 2 && (genParticles[k2].numberOfDaughters()) == 2 && dr<0.1 ){
+			if(dr > mindr){
+				
+			}
+			gParticleSiblingId[i] = genParticles[p].pdgId();
+			gParticleSiblingIndex[i] = p;
+			//if(gParticleId[i]==22) std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i]  << " test id " << genParticles[p].pdgId() <<std::endl;
+			//if(gParticleId[i]==22) std::cout<<" mother index " << gParticleMotherIndex[i] << " test mother index " << gParticleMotherIndex[p] << " test num dau " << genParticles[p].numberOfDaughters() <<std::endl;
+		}
+	  }
+  }
 
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;

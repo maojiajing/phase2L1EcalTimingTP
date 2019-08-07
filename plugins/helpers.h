@@ -32,10 +32,10 @@ reco::Candidate::LorentzVector getVisMomentum(const reco::GenParticle* genLeg, c
 void findDaughters(const reco::GenParticle* mother, std::vector<const reco::GenParticle*>& daughters, int status);
 
 // ------------ help functions  ------------
-const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *particle);
-const reco::Candidate* findFirstMotherWithDifferentID(const reco::GenParticle *particle);
-const reco::Candidate* findOriginalMotherWithSameID(const reco::Candidate *particle);
-const reco::Candidate* findOriginalMotherWithSameID(const reco::GenParticle *particle);
+const reco::Candidate *findFirstMotherWithDifferentID(const reco::Candidate *particle);
+const reco::Candidate *findFirstMotherWithDifferentID(const reco::GenParticle *particle);
+const reco::Candidate *findOriginalMotherWithSameID(const reco::Candidate *particle);
+const reco::Candidate *findOriginalMotherWithSameID(const reco::GenParticle *particle);
 //conversion between DetId <-> ieta/ix/iphi/iy
 int detID_from_iEtaiPhi(int iEta_or_iX, int iPhi_or_iY, bool isEB, bool isEEMinus);
 int iEta_or_iX_from_detID(int detID, bool isEB);

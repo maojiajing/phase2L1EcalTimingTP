@@ -175,6 +175,9 @@ private:
  int gParticleMotherId[GENPARTICLEARRAYSIZE];
  int gParticleMotherIndex[GENPARTICLEARRAYSIZE];
 
+ int gParticleSiblingId[GENPARTICLEARRAYSIZE];
+ int gParticleSiblingIndex[GENPARTICLEARRAYSIZE];
+
  int gParticleId[GENPARTICLEARRAYSIZE];
  int gParticleStatus[GENPARTICLEARRAYSIZE];
 
@@ -193,5 +196,22 @@ private:
  float gE10x10[GENPARTICLEARRAYSIZE];
  float gE5x5[GENPARTICLEARRAYSIZE];
  float gE3x3[GENPARTICLEARRAYSIZE];
+
+ float gParticleMotherE[GENPARTICLEARRAYSIZE];
+ float gParticleMotherPt[GENPARTICLEARRAYSIZE];
+ float gParticleMotherPx[GENPARTICLEARRAYSIZE];
+ float gParticleMotherPy[GENPARTICLEARRAYSIZE];
+ float gParticleMotherPz[GENPARTICLEARRAYSIZE];
+ float gParticleMotherEta[GENPARTICLEARRAYSIZE];
+ float gParticleMotherPhi[GENPARTICLEARRAYSIZE];
+
+ float gParticleSiblingE[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingPt[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingPx[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingPy[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingPz[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingEta[GENPARTICLEARRAYSIZE];
+ float gParticleSiblingPhi[GENPARTICLEARRAYSIZE];
+
 };
 
