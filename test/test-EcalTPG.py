@@ -114,16 +114,9 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.load("L1Trigger.phase2L1EcalTimingTP.phase2L1EcalTimingAnalyzer_cfi")
 
 process.L1EcalTimingAnalyzer = cms.EDAnalyzer('phase2L1EcalTimingAnalyzer',
-                                       l1PFObjects = cms.InputTag("l1pfCandidates","PF"),
-                                       l1TauObjects = cms.InputTag("L1PFTauProducer","L1PFTaus"),
-                                       L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
                                        genParticles = cms.InputTag("genParticles", "", "HLT"),
                                        genParticles_t0 = cms.InputTag("genParticles", "t0", "HLT"),
-                                       packedCandidates = cms.InputTag("packedPFCandidates"),
                                        ecalTPGsBarrel = cms.InputTag("simEcalEBTriggerPrimitiveDigis","","REPR"),
-                                       #ecalTPGsBarrel = cms.InputTag("simEcalEBTriggerPrimitiveDigis","","HLT"),
-                                       miniTaus = cms.InputTag("slimmedTaus"),
-                                       L1VertexInputTag = cms.InputTag("L1TkPrimaryVertex")
                                        )
 
 process.analyzer = cms.Path(process.L1EcalTimingAnalyzer)
@@ -144,8 +137,8 @@ associatePatAlgosToolsTask(process)
 
 # Customisation from command line
 
-from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
-process = L1TrackTriggerTracklet(process)
+#from L1Trigger.Configuration.customiseUtils import L1TrackTriggerTracklet
+#process = L1TrackTriggerTracklet(process)
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete

@@ -95,6 +95,7 @@
 // This will improve performance in multithreaded jobs.
 
 using namespace l1t;
+using namespace std;
 
 class phase2L1EcalTimingAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 public:
@@ -117,6 +118,9 @@ public:
   void resetEventInfoBranches();
   void resetEBCrystalBranches();
   void resetGenParticleBranches();
+
+// ------------corr eta phi  ------------
+  vector<float> EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen);
 
 private:
   virtual void beginJob() override;

@@ -40,7 +40,11 @@ const reco::Candidate* findOriginalMotherWithSameID(const reco::GenParticle *par
 int detID_from_iEtaiPhi(int iEta_or_iX, int iPhi_or_iY, bool isEB, bool isEEMinus);
 int iEta_or_iX_from_detID(int detID, bool isEB);
 int iPhi_or_iY_from_detID(int detID, bool isEB);
+//conversion
 int eta_to_iEta(float eta);
 float iEta_to_eta(int iEta);
 float Et_to_E(float Et, int ieta);
+//dR
+float dPhi(float phi1, float phi2);
+float deltaR(float eta1, float phi1, float eta2, float phi2);
 #endif

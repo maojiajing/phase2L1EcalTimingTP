@@ -202,6 +202,46 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
 
 
 
+// ------------corr eta phi  ------------
+vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen){
+	//X, Y, Z are for PV
+
+	//gen
+	float E = gen.energy();
+	float Pt = gen.pt();
+	float Px = gen.px();
+	float Py = gen.py();
+	float Pz = gen.pz();
+	float Phi = gen.phi();
+	float Eta = gen.eta();
+
+	float x_ecal = 0.;
+	float y_ecal = 0.;
+	float z_ecal = 0.;
+
+	float radius = sqrt( pow(X,2) + pow(Y,2) ); 
+	float radius_ecal = 129.0; //cm
+
+	float t_ecal = (1/30.)*(radius_ecal-radius)/(Pt/E);
+	
+	x_ecal = X + 30.*(Px/E)*t_ecal;
+	y_ecal = Y + 30.*(Py/E)*t_ecal;
+	z_ecal = Z + 30.*(Pz/E)*t_ecal;
+
+	//corrections of phi and eta wrt origin
+	float phi = atan((y_ecal-0.)/(x_ecal-X-0.));
+	if(x_ecal < 0.0) phi = TMath::Pi() + phi;
+
+	phi = dPhi(phi, 0.);
+
+	float theta = atan(sqrt(pow(x_ecal-0.,2)+pow(y_ecal-0.,2))/abs(z_ecal-0.));	
+	float eta = -1.0*TMath::Sign(1.0,z_ecal-0.)*log(tan(theta/2));
+
+	vector<float> etaphi;
+	etaphi.push_back(eta);
+	etaphi.push_back(phi);
+	return etaphi; 
+};
 
 
 
@@ -253,8 +293,8 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	      GlobalVector position;
 	      auto cell = ebGeometry->getGeometry(tpg.id());
 
-	      int et = tpg.encodedEt();
-	      //float et = tpg.encodedEt()/8.;
+	      //int et = tpg.encodedEt();
+	      float et = tpg.encodedEt()/8.; // convert ADC to GeV
 
 	      if(et<0.001) continue;//
 	        //float energy = et / sin(position.theta());
@@ -375,29 +415,67 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 
     //pi0 and Egammas in ecal barrel
     //if( (abs(gen.pdgId())==111 || abs(gen.pdgId())==22 || abs(gen.pdgId())==11) && abs(gen.eta()) < 1.5 ){
-    if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && gen.pt()>50 && abs(gen.eta()) < 1.5 ){
+    //if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && gen.pt()>50 && abs(gen.eta()) < 1.5 ){
+    if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && abs(gen.eta()) < 1.5 ){
 	//conversion between ieta, iphi and detID
 	int iEta = 1;
 	int iPhi = 1;
 	float unit = 2*TMath::Pi()/360;
 
-	iEta = eta_to_iEta(gen.eta());
-	iPhi = eta_to_iEta(gen.phi());
+	//corr eta phi to origin
+	vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
+	float eta = etaphi[0];
+	float phi = etaphi[1];
+
+	//iEta = eta_to_iEta(gen.eta());
+	//iPhi = eta_to_iEta(gen.phi());
+	iEta = eta_to_iEta(eta);
+	iPhi = eta_to_iEta(phi);
 
 	int id = detID_from_iEtaiPhi(iEta, iPhi, true, false);
-	std::cout<<" Particle Eta " << gen.eta() << " Phi " << gen.phi() << " ieta " << gen.eta()/unit << " iphi " << gen.phi()/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
+/*
+	int idmin1 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
+	int idmin2 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
+	int idmax1 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
+	int idmax2 = detID_from_iEtaiPhi(iEta, iPhi, true, false);
+*/
+	std::cout<<" Particle GEN Eta " << gen.eta() << " Phi " << gen.phi() << " ieta " << gen.eta()/unit << " iphi " << gen.phi()/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
+	std::cout<<" Particle CORR Eta " << eta << " Phi " << phi << " ieta " << eta/unit << " iphi " << phi/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
 
 	float Edep10x10 = 0.;
 	float Edep5x5 = 0.;
 	float Edep3x3 = 0.;
 	float Edep = 0.;
 	for(int k=0; k<nCrystals; k++){
-		for(int k1=iEta-5;k1<iEta+5;k1++){
-			for(int k2=iPhi-5;k2<iPhi+5;k2++){
+		//float eb_eta = iEta_to_eta(eb_ieta[k]);
+		//float eb_phi = iEta_to_eta(eb_iphi[k]);
+		float eb_eta = eb_cell_Eta[k];
+		float eb_phi = eb_cell_Phi[k];
+		float deltaR_eb_gen = deltaR(eb_eta, eb_phi, eta, phi);
+		if(eb_Et[k]!=-666 ) Edep = Et_to_E(eb_Et[k], eb_ieta[k]);
+		else Edep = 0.;
+		//Edep = eb_Et[k];
+		if(deltaR_eb_gen < 0.1 ){
+			Edep10x10 += Edep;
+		}
+		if(deltaR_eb_gen < 0.05 ){
+			Edep5x5 += Edep;
+		}
+		if(deltaR_eb_gen < 0.03 ){
+			Edep3x3 += Edep;
+		}
+	}
+/*
+	for(int k=0; k<nCrystals; k++){
+		for(int k1=-85;k1<85;k1++){
+			for(int k2=0;k2<360;k2++){
 				int id_neighbbor = detID_from_iEtaiPhi(k1, k2, true, false);
-				if(eb_id[k]==id_neighbbor){
-					Edep = Et_to_E(eb_Et[k], eb_ieta[k]);
-  					std::cout<<"Found EB crystal for particle " << gen.pdgId() << " with id " << id_neighbbor << " iEta " << k1  << " iPhi "<< k2  << " Et " << eb_Et[k] <<" E " << Edep <<std::endl;
+				float eb_eta = iEta_to_eta(k1);
+				float eb_phi = iEta_to_eta(k2);
+				float deltaR_eb_gen = deltaR(eb_eta, eb_phi, eta, phi);
+				Edep = Et_to_E(eb_Et[k], eb_ieta[k]);
+				if(deltaR_eb_gen < 0.3 && eb_id[k]==id_neighbbor ){
+  					//std::cout<<"Found EB crystal for particle " << gen.pdgId() << " with id " << id_neighbbor << " iEta " << k1  << " iPhi "<< k2  << " Et " << eb_Et[k] <<" E " << Edep <<std::endl;
 					Edep10x10 += Edep;
 					if(k1>=iEta-2 && k1<=iEta+2 && k2>=iPhi-2 && k2<=iPhi+2) Edep5x5 += Edep;
 					if(k1>=iEta-1 && k1<=iEta+1 && k2>=iPhi-1 && k2<=iPhi+1) Edep3x3 += Edep;
@@ -405,13 +483,13 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 			}
 		}
 	}
+*/
 	gE10x10[i] = Edep10x10;
 	gE5x5[i] = Edep5x5;
 	gE3x3[i] = Edep3x3;
 
 	std::cout<<"Eta " << gen.eta() << " Phi " << gen.phi() <<  " iEta " << iEta << " iPhi " << iPhi << " E " << gen.energy()  << " Pt " << gen.pt() << " Edep 10x10 " << Edep10x10 << " Edep 5x5 " << Edep5x5 << " Edep3x3 " << Edep3x3  <<std::endl;
-    } 
-
+    }//photons 
 
   }//loop of gen
 

@@ -379,6 +379,25 @@ float Et_to_E(float Et, int ieta){
 	float eta = iEta_to_eta(ieta);
 	theta = 2*TMath::ATan(exp(-eta));
 	E = Et/sin(theta);
-  	std::cout<< " iEta " << ieta  << " Et " << Et <<" E " << E << " theta " << theta <<std::endl;
+  	//std::cout<< " iEta " << ieta  << " Et " << Et <<" E " << E << " theta " << theta <<std::endl;
 	return E;
+};
+
+float dPhi(float phi1, float phi2){
+	float dphi = phi1-phi2;
+	while (dphi > TMath::Pi())
+  	{	
+    		dphi -= TMath::TwoPi();
+  	}
+  	while (dphi <= -TMath::Pi())
+  	{
+    	dphi += TMath::TwoPi();
+  	}
+  	return dphi;
+};
+
+float deltaR(float eta1, float phi1, float eta2, float phi2){
+	float dphi12 = dPhi(phi1,phi2);
+	float deta12 = eta1 - eta2;
+	return sqrt( dphi12*dphi12 + deta12*deta12);
 };
