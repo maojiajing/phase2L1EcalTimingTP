@@ -155,6 +155,7 @@ private:
  int nCrystals; 
 
  float eb_Et[EBCRYSTALARRAYSIZE];
+ float eb_Edep[EBCRYSTALARRAYSIZE];
  float eb_time[EBCRYSTALARRAYSIZE];
  int eb_id[EBCRYSTALARRAYSIZE];
  int eb_ieta[EBCRYSTALARRAYSIZE];
@@ -171,6 +172,9 @@ private:
  float genVertexY;
  float genVertexZ;
  float genVertexT;
+
+ int gParticleGrandMotherId[GENPARTICLEARRAYSIZE];
+ int gParticleGrandMotherIndex[GENPARTICLEARRAYSIZE];
 
  int gParticleMotherId[GENPARTICLEARRAYSIZE];
  int gParticleMotherIndex[GENPARTICLEARRAYSIZE];
@@ -193,9 +197,26 @@ private:
  float gParticle_decay_vtx_y[GENPARTICLEARRAYSIZE];
  float gParticle_decay_vtx_z[GENPARTICLEARRAYSIZE];
 
- float gE10x10[GENPARTICLEARRAYSIZE];
- float gE5x5[GENPARTICLEARRAYSIZE];
- float gE3x3[GENPARTICLEARRAYSIZE];
+ float gEmax_02[GENPARTICLEARRAYSIZE];
+ int gImax_02[GENPARTICLEARRAYSIZE];
+ float gE9x9_02[GENPARTICLEARRAYSIZE];
+ float gE5x5_02[GENPARTICLEARRAYSIZE];
+ float gE3x3_02[GENPARTICLEARRAYSIZE];
+
+ float gEmax_01[GENPARTICLEARRAYSIZE];
+ int gImax_01[GENPARTICLEARRAYSIZE];
+ float gE9x9_01[GENPARTICLEARRAYSIZE];
+ float gE5x5_01[GENPARTICLEARRAYSIZE];
+ float gE3x3_01[GENPARTICLEARRAYSIZE];
+
+ float gParticleGrandMotherE[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherPt[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherPx[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherPy[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherPz[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherEta[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherPhi[GENPARTICLEARRAYSIZE];
+ float gParticleGrandMotherDR[GENPARTICLEARRAYSIZE];
 
  float gParticleMotherE[GENPARTICLEARRAYSIZE];
  float gParticleMotherPt[GENPARTICLEARRAYSIZE];
