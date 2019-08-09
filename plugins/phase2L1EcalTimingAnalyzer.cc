@@ -528,12 +528,81 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 
      }// finish gen mother
 
+	  int k1 = gParticleMotherIndex[i]; //mother index
+
+	  int k11 = gParticleMotherIndex[k1]; // grand mother index
+
+	 //grand mother info
+	 if(k1!=-666 && k11 != -666){
+	 	reco::GenParticle grandmom = genParticles[k11];
+
+		gParticleGrandMotherId[i] = genParticles[k11].pdgId();
+		gParticleGrandMotherIndex[i] = k11;
+
+        	gParticleGrandMotherE[i] = grandmom.energy();
+        	gParticleGrandMotherPt[i] = grandmom.pt();
+        	gParticleGrandMotherPx[i] = grandmom.px();
+        	gParticleGrandMotherPy[i] = grandmom.py();
+        	gParticleGrandMotherPz[i] = grandmom.pz();
+        	gParticleGrandMotherEta[i] = grandmom.eta();
+        	gParticleGrandMotherPhi[i] = grandmom.phi();
+        	gParticleGrandMotherDR[i] = deltaR(grandmom.eta(), grandmom.phi(), genParticles[i].eta(), genParticles[i].phi());
+		
+	 }//finish grand mother
+
+	  float mindr = 0.;
+	  for(unsigned int p = 0; p < genParticles.size(); p++)
+	  {	
+	  	int k2 = gParticleMotherIndex[p];
+
+		//float dr = deltaR(gParticleEta[i], gParticlePhi[i], gParticleEta[p], gParticlePhi[p]);
+		if(p!=i && k1==k2){
+			//if(dr > mindr){}
+			gParticleSiblingId[i] = genParticles[p].pdgId();
+			gParticleSiblingIndex[i] = p;
+
+			//sibling info
+			int si = gParticleSiblingIndex[i];
+			if(si!=-666){
+		    		reco::GenParticle sibling = genParticles[si];
+		
+		        	gParticleSiblingE[i] = sibling.energy();
+		        	gParticleSiblingPt[i] = sibling.pt();
+		        	gParticleSiblingPx[i] = sibling.px();
+		        	gParticleSiblingPy[i] = sibling.py();
+		        	gParticleSiblingPz[i] = sibling.pz();
+		        	gParticleSiblingEta[i] = sibling.eta();
+		        	gParticleSiblingPhi[i] = sibling.phi();
+        			gParticleSiblingDR[i] = deltaR(sibling.eta(), sibling.phi(), genParticles[i].eta(), genParticles[i].phi());
+			}
+
+			gParticleSiblingId[p] = genParticles[i].pdgId();
+			gParticleSiblingIndex[p] = i;
+
+			//sibling info
+			int him = gParticleSiblingIndex[p];
+			if(him!=-666){
+		    		reco::GenParticle himself = genParticles[him];
+		
+		        	gParticleSiblingE[p] = himself.energy();
+		        	gParticleSiblingPt[p] = himself.pt();
+		        	gParticleSiblingPx[p] = himself.px();
+		        	gParticleSiblingPy[p] = himself.py();
+		        	gParticleSiblingPz[p] = himself.pz();
+		        	gParticleSiblingEta[p] = himself.eta();
+		        	gParticleSiblingPhi[p] = himself.phi();
+        			gParticleSiblingDR[p] = deltaR(himself.eta(), himself.phi(), genParticles[p].eta(), genParticles[p].phi());
+			}
+			//if(gParticleId[i]==22) std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i]  << " test id " << genParticles[p].pdgId() <<std::endl;
+			//if(gParticleId[i]==22) std::cout<<" mother index " << gParticleMotherIndex[i] << " test mother index " << gParticleMotherIndex[p] << " test num dau " << genParticles[p].numberOfDaughters() <<std::endl;
+		}
+	  }//finish sibling
     //pi0 and Egammas in ecal barrel
     //if( (abs(gen.pdgId())==111 || abs(gen.pdgId())==22 || abs(gen.pdgId())==11) && abs(gen.eta()) < 1.5 ){
     //if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && gen.pt()>50 && abs(gen.eta()) < 1.5 ){
     //
-    //gammas in ecal barrel
-    if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && abs(gen.eta()) < 1.5 ){
+    //gammas and pi0s in ecal barrel
+    if(( (abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111) || abs(gen.pdgId())==111)  && abs(gen.eta()) < 1.5 ){
 	//conversion between ieta, iphi and detID
 	int iEta = 1;
 	int iPhi = 1;
@@ -635,30 +704,11 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	gE5x5_01[i] = Edep5x5_02;
 	gE3x3_01[i] = Edep3x3_02;
 
-/*
-	for(int k=0; k<nCrystals; k++){
-		for(int k1=-85;k1<85;k1++){
-			for(int k2=0;k2<360;k2++){
-				int id_neighbbor = detID_from_iEtaiPhi(k1, k2, true, false);
-				float eb_eta = iEta_to_eta(k1);
-				float eb_phi = iEta_to_eta(k2);
-				float deltaR_eb_gen = deltaR(eb_eta, eb_phi, eta, phi);
-				Edep = Et_to_E(eb_Et[k], eb_ieta[k]);
-				if(deltaR_eb_gen < 0.3 && eb_id[k]==id_neighbbor ){
-  					//std::cout<<"Found EB crystal for particle " << gen.pdgId() << " with id " << id_neighbbor << " iEta " << k1  << " iPhi "<< k2  << " Et " << eb_Et[k] <<" E " << Edep <<std::endl;
-					Edep9x9 += Edep;
-					if(k1>=iEta-2 && k1<=iEta+2 && k2>=iPhi-2 && k2<=iPhi+2) Edep5x5 += Edep;
-					if(k1>=iEta-1 && k1<=iEta+1 && k2>=iPhi-1 && k2<=iPhi+1) Edep3x3 += Edep;
-				}
-			}
-		}
-	}
-*/
 	//std::cout<<"Eta " << gen.eta() << " Phi " << gen.phi() <<  " iEta " << iEta << " iPhi " << iPhi << " E " << gen.energy()  << " Pt " << gen.pt() << " Edep 9x9 " << Edep9x9 << " Edep 5x5 " << Edep5x5 << " Edep3x3 " << Edep3x3  <<std::endl;
-    }//photons 
+    }//photons and pi0s 
 
   }//loop of gen
-
+/*
   for(unsigned int i = 0; i< genParticles.size(); i++){
 	  reco::GenParticle gen = genParticles[i];
 
@@ -714,7 +764,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 		}
 	  }
   }
-
+*/
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;
 }
