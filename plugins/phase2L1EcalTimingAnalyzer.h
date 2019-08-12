@@ -16,6 +16,7 @@
 //
 #define GENPARTICLEARRAYSIZE 2000
 #define EBCRYSTALARRAYSIZE 70000
+#define GENJETARRAYSIZE 2000
 
 // system include files
 #include <memory>
@@ -52,6 +53,25 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "DataFormats/JetReco/interface/Jet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/JetReco/interface/PFJetCollection.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/METReco/interface/GenMETCollection.h"
+#include "DataFormats/METReco/interface/GenMET.h"
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/PFJetCollection.h"
+#include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
+#include "DataFormats/ParticleFlowReco/interface/PFClusterFwd.h"
+#include "DataFormats/METReco/interface/PFMETCollection.h"
+#include "DataFormats/TauReco/interface/PFTau.h"
+#include "DataFormats/JetReco/interface/CaloJet.h"
+#include "DataFormats/JetReco/interface/PFJet.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
+#include "DataFormats/JetReco/interface/BasicJetCollection.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 
@@ -112,12 +132,14 @@ public:
   void enableEventInfoBranches();
   void enableEBCrystalBranches();
   void enableGenParticleBranches();
+  void enableGenJetBranches();
 
 // ------------ reset branches  ------------
   virtual void resetBranches();
   void resetEventInfoBranches();
   void resetEBCrystalBranches();
   void resetGenParticleBranches();
+  void resetGenJetBranches();
 
 // ------------corr eta phi  ------------
   vector<float> EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen);
@@ -129,19 +151,23 @@ private:
 
   // ----------member data ---------------------------
   typedef std::vector<reco::GenParticle> GenParticleCollectionType;
+  typedef std::vector<reco::GenJet> GenJetCollectionType;
 
 
   const CaloSubdetectorGeometry * ebGeometry;
   edm::ESHandle<CaloGeometry> caloGeometry_;
 
+  edm::EDGetTokenT<std::vector<reco::GenJet> > genJetToken_;
   edm::EDGetTokenT<std::vector<reco::GenParticle> > genToken_;
   edm::EDGetTokenT<float> genTokenT_;
   edm::EDGetTokenT<EcalEBTrigPrimDigiCollection> ecalTPGBToken_;
 
   edm::Handle<EcalEBTrigPrimDigiCollection> ecaltpgCollection;
+  edm::Handle<GenJetCollectionType> genJetHandle;
   edm::Handle<GenParticleCollectionType> genParticleHandle;
   edm::Handle<float> genVertexTHandle;
 
+  edm::InputTag genSrcJ_;
   edm::InputTag genSrc_;
   edm::InputTag genSrcT_;
 
@@ -164,6 +190,36 @@ private:
  int eb_ic[EBCRYSTALARRAYSIZE];
  float eb_cell_Eta[EBCRYSTALARRAYSIZE];
  float eb_cell_Phi[EBCRYSTALARRAYSIZE];
+
+ //jet info
+ int nGenJets;
+
+ float gJetMass[GENJETARRAYSIZE];
+ float gJetE[GENJETARRAYSIZE];
+ float gJetEt[GENJETARRAYSIZE];
+ float gJetPt[GENJETARRAYSIZE];
+ float gJetPx[GENJETARRAYSIZE];
+ float gJetPy[GENJETARRAYSIZE];
+ float gJetPz[GENJETARRAYSIZE];
+ float gJetEta[GENJETARRAYSIZE];
+ float gJetPhi[GENJETARRAYSIZE];
+
+ float gJetArea[GENJETARRAYSIZE];
+
+ float gJetPileupE[GENJETARRAYSIZE];
+ int gJetPileupIdFlag[GENJETARRAYSIZE];
+
+ bool gJetPassIdLoose[GENJETARRAYSIZE];
+ bool gJetPassIdTight[GENJETARRAYSIZE];
+
+ float gJetMuEnergy[GENJETARRAYSIZE];
+ float gJetEleFrac[GENJETARRAYSIZE];
+ float gJetEmEnergy[GENJETARRAYSIZE];
+ float gJetChargedEmEnergy[GENJETARRAYSIZE];
+ float gJetNeutralEmEnergy[GENJETARRAYSIZE];
+ float gJetHadronEnergy[GENJETARRAYSIZE];
+ float gJetChargedHadronEnergy[GENJETARRAYSIZE];
+ float gJetNeutralHadronEnergy[GENJETARRAYSIZE];
 
  //gen info
  int nGenParticles;

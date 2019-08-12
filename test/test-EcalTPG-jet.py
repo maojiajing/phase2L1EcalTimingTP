@@ -37,7 +37,7 @@ process.source = cms.Source("PoolSource",
 #				  'file:/afs/cern.ch/user/j/jmao/work/public/releases/L1_Trigger/MC_Production/FollowCIEMAT/CMSSW_10_6_0_pre4/src/L1Trigger/phase2L1EcalTimingTP/test/testEvent.root'),
 				#'/store/mc/PhaseIIMTDTDRAutumn18MiniAOD/GluGluHToTauTau_M125_14TeV_powheg_pythia8/MINIAODSIM/PU200_103X_upgrade2023_realistic_v2-v1/80000/EC78B837-81E3-054E-8A11-05762CDA1980.root'),
 #				  'file:/afs/cern.ch/user/j/jmao/work/public/releases/L1_Trigger/MC_Production/FollowCIEMAT/CMSSW_10_6_0_pre4/src/L1Trigger/phase2L1EcalTimingTP/test/testEvent.root'),
-				  'file:/afs/cern.ch/user/j/jmao/work/public/releases/L1_Trigger/MC_Production/FollowCIEMAT/CMSSW_10_6_1_patch2/src/step2_2ev_reprocess_slim.root'),
+				  'file:/afs/cern.ch/user/j/jmao/work/public/releases/L1_Trigger/MC_Production/FollowCIEMAT/CMSSW_10_6_1_patch2/src/step2_2ev_reprocess_slim_jet.root'),
 
    secondaryFileNames = cms.untracked.vstring(
 #       'root://cmsxrootd.fnal.gov//store/mc/PhaseIIMTDTDRAutumn18DR/DYToLL_M-50_14TeV_TuneCP5_pythia8/FEVT/NoPU_103X_upgrade2023_realistic_v2-v2/90000/9CDB6CBE-E063-9049-A794-244A09CA53A0.root'
@@ -115,6 +115,7 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.load("L1Trigger.phase2L1EcalTimingTP.phase2L1EcalTimingAnalyzer_cfi")
 
 process.L1EcalTimingAnalyzer = cms.EDAnalyzer('phase2L1EcalTimingAnalyzer',
+                                       ak4GenJets = cms.InputTag("ak4GenJets", "", "HLT"),
                                        genParticles = cms.InputTag("genParticles", "", "HLT"),
                                        genParticles_t0 = cms.InputTag("genParticles", "t0", "HLT"),
                                        ecalTPGsBarrel = cms.InputTag("simEcalEBTriggerPrimitiveDigis","","REPR"),
@@ -123,7 +124,7 @@ process.L1EcalTimingAnalyzer = cms.EDAnalyzer('phase2L1EcalTimingAnalyzer',
 process.analyzer = cms.Path(process.L1EcalTimingAnalyzer)
 
 process.TFileService = cms.Service("TFileService", 
-   fileName = cms.string("analyzer-dyll-4FEVT.root"), 
+   fileName = cms.string("analyzer-dyll-4FEVT-jet.root"), 
    closeFileFast = cms.untracked.bool(True)
 )
 

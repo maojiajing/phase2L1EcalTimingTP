@@ -31,11 +31,13 @@
 //
 phase2L1EcalTimingAnalyzer::phase2L1EcalTimingAnalyzer(const edm::ParameterSet& cfg):
   ecalTPGBToken_(   consumes<EcalEBTrigPrimDigiCollection>(cfg.getParameter<edm::InputTag>("ecalTPGsBarrel"))),
+  genSrcJ_ ((        cfg.getParameter<edm::InputTag>( "ak4GenJets"))),
   genSrc_ ((        cfg.getParameter<edm::InputTag>( "genParticles"))),
   genSrcT_ ((        cfg.getParameter<edm::InputTag>( "genParticles_t0")))
 {
   //now do what ever initialization is needed
   usesResource("TFileService");
+  genJetToken_ =     consumes<std::vector<reco::GenJet> >(genSrcJ_);
   genToken_ =     consumes<std::vector<reco::GenParticle> >(genSrc_);
   genTokenT_ =     consumes<float>(genSrcT_);
   
@@ -59,6 +61,12 @@ void phase2L1EcalTimingAnalyzer::loadEvent(const edm::Event& iEvent){
   //control plot for ecal crystals
   iEvent.getByToken( ecalTPGBToken_, ecaltpgCollection);
 
+  if(!iEvent.getByToken(genJetToken_,genJetHandle))
+    std::cout<<"No gen jets Found "<<std::endl;
+  else{
+    //std::cout<<"Gen Jets size "<<genJetHandle->size()<<std::endl;
+  }
+	
   if(!iEvent.getByToken(genToken_,genParticleHandle))
     std::cout<<"No gen Particles Found "<<std::endl;
   else{
@@ -79,6 +87,7 @@ void phase2L1EcalTimingAnalyzer::setBranches(){
   enableEventInfoBranches();
   enableEBCrystalBranches();
   enableGenParticleBranches();
+  enableGenJetBranches();
 };
 
 void phase2L1EcalTimingAnalyzer::enableEventInfoBranches(){
@@ -178,11 +187,46 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
 
 };
 
+void phase2L1EcalTimingAnalyzer::enableGenJetBranches(){
+ //jet info
+ ecalTPTree->Branch("nGenJets", &nGenJets, "nGenJets/I");
+
+ ecalTPTree->Branch("gJetMass", &gJetMass, "gJetMass[nGenJets]/F");
+ ecalTPTree->Branch("gJetE", &gJetE, "gJetE[nGenJets]/F");
+ ecalTPTree->Branch("gJetEt", &gJetEt, "gJetEt[nGenJets]/F");
+ ecalTPTree->Branch("gJetPt", &gJetPt, "gJetPt[nGenJets]/F");
+ ecalTPTree->Branch("gJetPx", &gJetPx, "gJetPx[nGenJets]/F");
+ ecalTPTree->Branch("gJetPy", &gJetPy, "gJetPy[nGenJets]/F");
+ ecalTPTree->Branch("gJetPz", &gJetPz, "gJetPz[nGenJets]/F");
+ ecalTPTree->Branch("gJetEta", &gJetEta, "gJetEta[nGenJets]/F");
+ ecalTPTree->Branch("gJetPhi", &gJetPhi, "gJetPhi[nGenJets]/F");
+
+ ecalTPTree->Branch("gJetArea", &gJetArea, "gJetArea[nGenJets]/F");
+
+ ecalTPTree->Branch("gJetPileupE", &gJetPileupE, "gJetPileupE[nGenJets]/F");
+ ecalTPTree->Branch("gJetPileupIdFlag", &gJetPileupIdFlag, "gJetPileupIdFlag[nGenJets]/I");
+
+ ecalTPTree->Branch("gJetPassIdLoose", &gJetPassIdLoose, "gJetPassIdLoose[nGenJets]/O");
+ ecalTPTree->Branch("gJetPassIdTight", &gJetPassIdTight, "gJetPassIdTight[nGenJets]/O");
+
+
+ ecalTPTree->Branch("gJetMuEnergy", &gJetMuEnergy, "gJetMuEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gJetEleFrac", &gJetEleFrac, "gJetEleFrac[nGenJets]/F");
+ ecalTPTree->Branch("gJetEmEnergy", &gJetEmEnergy, "gJetEmEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gJetChargedEmEnergy", &gJetChargedEmEnergy, "gJetChargedEmEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gJetNeutralEmEnergy", &gJetNeutralEmEnergy, "gJetNeutralEmEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gJetHadronEnergy", &gJetHadronEnergy, "gJetHadronEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gJetChargedHadronEnergy", &gJetChargedHadronEnergy, "gJetChargedHadronEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gJetNeutralHadronEnergy", &gJetNeutralHadronEnergy, "gJetNeutralHadronEnergy[nGenJets]/F");
+
+};
+
 // ------------ reset branches  ------------
 void phase2L1EcalTimingAnalyzer::resetBranches(){
   resetEventInfoBranches();
   resetEBCrystalBranches();
   resetGenParticleBranches();
+  resetGenJetBranches();
 };
 
 void phase2L1EcalTimingAnalyzer::resetEventInfoBranches(){
@@ -290,7 +334,39 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
 };
 
 
+void phase2L1EcalTimingAnalyzer::resetGenJetBranches(){
+ //jet info
+ nGenJets = 0;
 
+ for(int i=0; i<GENJETARRAYSIZE; i++){
+ gJetMass[i] = -666.;
+ gJetE[i]    = -666.;
+ gJetEt[i]   = -666.;
+ gJetPt[i]   = -666.;
+ gJetPx[i]   = -666.;
+ gJetPy[i]   = -666.;
+ gJetPz[i]   = -666.;
+ gJetEta[i]  = -666.;
+ gJetPhi[i]  = -666.;
+
+ gJetArea[i] = -666.;
+
+ gJetPileupE[i] = -666. ;
+ gJetPileupIdFlag[i] = -666;
+
+ gJetPassIdLoose[i] = false;
+ gJetPassIdTight[i] = false;
+
+ gJetMuEnergy[i] = -666.;
+ gJetEleFrac[i] = -666.;
+ gJetEmEnergy[i] =-666.;
+ gJetChargedEmEnergy[i] =-666.;
+ gJetNeutralEmEnergy[i] = -666.;
+ gJetHadronEnergy[i] = -666.;
+ gJetChargedHadronEnergy[i] = -666.;
+ gJetNeutralHadronEnergy[i] = -666.;
+ }
+};
 // ------------corr eta phi  ------------
 vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen){
 	//X, Y, Z are for PV
@@ -419,7 +495,9 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   std::vector<reco::GenParticle> genPiZeros;
   std::vector<reco::GenParticle> genParticles;
   
+
   bool foundGenVertex = false;
+  int pi = 0;
   for(unsigned int i = 0; i< genParticleHandle->size(); i++){
 
     edm::Ptr<reco::GenParticle> ptr(genParticleHandle, i);
@@ -427,7 +505,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
        (abs((ptr)->pdgId()) == 2212 ) //protons
        || (abs((ptr)->pdgId()) >= 1 && abs((ptr)->pdgId()) <= 6 )//&& ( (ptr)->status() < 30 )) //quarks
        || (abs((ptr)->pdgId()) >= 11 && abs((ptr)->pdgId()) <= 16) //leptons
-       || (abs((ptr)->pdgId()) == 21 && (ptr)->status() < 30) //gluons
+       //|| (abs((ptr)->pdgId()) == 21) // && (ptr)->status() < 30) //gluons
        || (abs((ptr)->pdgId()) >= 22 && abs((ptr)->pdgId()) <= 25) //&& ( (ptr)->status() < 30)) //gammas, z0, w, higgs
        || (abs((ptr)->pdgId()) >= 32 && abs((ptr)->pdgId()) <= 42) // other gauge and higgs bosons
        || (abs((ptr)->pdgId()) == 111 || abs((ptr)->pdgId()) == 211) // pi0 or pi+ pi-
@@ -437,7 +515,13 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
        || (abs((ptr)->pdgId()) == 9000006 || abs((ptr)->pdgId()) == 9000007) //llp
      ){
     genParticles.push_back(*ptr);
+/*
+    reco::GenParticle gen = *ptr;
+    gParticleId[pi] = gen.pdgId();
+    pi++;
+*/
     }
+    //genParticles.push_back(*ptr);
 
     int num = ptr->numberOfDaughters();
     if (!foundGenVertex)
@@ -464,7 +548,6 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 
   //fill gen info
   nGenParticles = genParticles.size();
- 
   for(unsigned int i = 0; i< genParticles.size(); i++){
     reco::GenParticle gen = genParticles[i];
 
@@ -485,6 +568,26 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 
     // gen mother
     if(gen.numberOfMothers() > 0){
+/*
+	const reco::Candidate* mother = gen.mother(0);
+	//const reco::Candidate mother = *mo;
+
+        			gParticleMotherId[i] = mother->pdgId();
+	for(unsigned int j = 0; j < genParticles.size(); j++)
+	{
+		if(genParticles[j].pdgId() == mother->pdgId() && genParticles[j].energy() == mother->energy() && genParticles[j].eta() ==mother->eta() && genParticles[j].phi() == mother->phi() && genParticles[j].pt() == mother->pt() && genParticles[j].px() == mother->px() )
+			gParticleMotherIndex[i] = j;
+        }
+        			gParticleMotherE[i] = mother->energy();
+        			gParticleMotherPt[i] = mother->pt();
+        			gParticleMotherPx[i] = mother->px();
+        			gParticleMotherPy[i] = mother->py();
+        			gParticleMotherPz[i] = mother->pz();
+        			gParticleMotherEta[i] = mother->eta();
+        			gParticleMotherPhi[i] = mother->phi();
+        			gParticleMotherDR[i] = deltaR(mother->eta(), mother->phi(), genParticles[i].eta(), genParticles[i].phi());
+*/
+//careful version
 	const reco::Candidate *firstMotherWithDifferentID = findFirstMotherWithDifferentID(&gen);
         if (firstMotherWithDifferentID)
         {
@@ -501,7 +604,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 		//<< " *j " << *genParticles[j] 
 		//<< " *o " << *originalMotherWithSameID 
 		//<<std::endl;
-		if(genParticles[j].pdgId() == originalMotherWithSameID->pdgId() && genParticles[j].energy() == originalMotherWithSameID->energy() && genParticles[j].eta() ==originalMotherWithSameID->eta() && genParticles[j].phi() == originalMotherWithSameID->phi() && genParticles[j].pt() == originalMotherWithSameID->pt() && genParticles[j].px() == originalMotherWithSameID->px() )
+		if(genParticles[j].pdgId() == originalMotherWithSameID->pdgId() && genParticles[j].status() == originalMotherWithSameID->status() && genParticles[j].energy() == originalMotherWithSameID->energy() && genParticles[j].eta() ==originalMotherWithSameID->eta() && genParticles[j].phi() == originalMotherWithSameID->phi() && genParticles[j].pt() == originalMotherWithSameID->pt() && genParticles[j].px() == originalMotherWithSameID->px() )
 		{
 			//std::cout<<" find "<<std::endl;
 
@@ -525,7 +628,6 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 			break;
 		}
 	}
-
      }// finish gen mother
 
 	  int k1 = gParticleMotherIndex[i]; //mother index
@@ -550,14 +652,17 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 		
 	 }//finish grand mother
 
-	  float mindr = 0.;
+	  float mindr = 1000.;
 	  for(unsigned int p = 0; p < genParticles.size(); p++)
 	  {	
 	  	int k2 = gParticleMotherIndex[p];
 
-		//float dr = deltaR(gParticleEta[i], gParticlePhi[i], gParticleEta[p], gParticlePhi[p]);
+		float dr = deltaR(gParticleEta[i], gParticlePhi[i], gParticleEta[p], gParticlePhi[p]);
 		if(p!=i && k1==k2){
-			//if(dr > mindr){}
+			if(dr <= mindr){
+			
+			mindr = dr;
+
 			gParticleSiblingId[i] = genParticles[p].pdgId();
 			gParticleSiblingIndex[i] = p;
 
@@ -593,6 +698,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 		        	gParticleSiblingPhi[p] = himself.phi();
         			gParticleSiblingDR[p] = deltaR(himself.eta(), himself.phi(), genParticles[p].eta(), genParticles[p].phi());
 			}
+			}//mindr
 			//if(gParticleId[i]==22) std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i]  << " test id " << genParticles[p].pdgId() <<std::endl;
 			//if(gParticleId[i]==22) std::cout<<" mother index " << gParticleMotherIndex[i] << " test mother index " << gParticleMotherIndex[p] << " test num dau " << genParticles[p].numberOfDaughters() <<std::endl;
 		}
@@ -765,6 +871,43 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	  }
   }
 */
+
+
+  //gen jet info
+  //nGenJets = genJetHandle->size();
+  for(const reco::GenJet &jet : *genJetHandle){
+  //for(auto& jet : *genJetHandle.product()){
+	nGenJets ++;
+
+	gJetMass[nGenJets-1] = jet.mass();
+	gJetE[nGenJets-1] = jet.energy();
+	gJetEt[nGenJets-1] = jet.et();
+	gJetPt[nGenJets-1] = jet.pt();
+	gJetPx[nGenJets-1] = jet.px();
+	gJetPy[nGenJets-1] = jet.py();
+	gJetPz[nGenJets-1] = jet.pz();
+	gJetEta[nGenJets-1] = jet.eta();
+	gJetPhi[nGenJets-1] = jet.phi();
+
+	gJetArea[nGenJets-1] = jet.jetArea();
+
+	gJetPileupE[nGenJets-1] = jet.pileup();
+	gJetPileupIdFlag[nGenJets-1] = 0;
+
+	//gJetPassIdLoose[nGenJets-1] = passJetID(&jet, 0);
+	//gJetPassIdTight[nGenJets-1] = passJetID(&jet, 1);
+
+	gJetMuEnergy[nGenJets-1] = jet.muonEnergy();
+	//gJetEleFrac[nGenJets-1] = jet.electronEnergyFraction();
+	gJetEmEnergy[nGenJets-1] = jet.emEnergy();
+	gJetChargedEmEnergy[nGenJets-1] = jet.chargedEmEnergy();
+	gJetNeutralEmEnergy[nGenJets-1] = jet.neutralEmEnergy();
+	gJetHadronEnergy[nGenJets-1] = jet.hadEnergy();
+	gJetChargedHadronEnergy[nGenJets-1] = jet.chargedHadronEnergy();
+	gJetNeutralHadronEnergy[nGenJets-1] = jet.neutralHadronEnergy();
+  }
+
+
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;
 }
