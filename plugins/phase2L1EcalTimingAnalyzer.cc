@@ -600,71 +600,18 @@ void phase2L1EcalTimingAnalyzer::resetGenak8JetNoNuBranches(){
 };
 
 
-// ------------corr eta phi  ------------
-vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen){
-	//X, Y, Z are for PV
-
-	//gen
-	float E = gen.energy();
-	float Pt = gen.pt();
-	float Px = gen.px();
-	float Py = gen.py();
-	float Pz = gen.pz();
-	float Phi = gen.phi();
-	float Eta = gen.eta();
-
-	float x_ecal = 0.;
-	float y_ecal = 0.;
-	float z_ecal = 0.;
-
-	float radius = sqrt( pow(X,2) + pow(Y,2) ); 
-	float radius_ecal = 129.0; //cm
-
-	float t_ecal = (1/30.)*(radius_ecal-radius)/(Pt/E);
-	
-	x_ecal = X + 30.*(Px/E)*t_ecal;
-	y_ecal = Y + 30.*(Py/E)*t_ecal;
-	z_ecal = Z + 30.*(Pz/E)*t_ecal;
-
-	//corrections of phi and eta wrt origin
-	float phi = atan((y_ecal-0.)/(x_ecal-X-0.));
-	if(x_ecal < 0.0) phi = TMath::Pi() + phi;
-
-	phi = dPhi(phi, 0.);
-
-	float theta = atan(sqrt(pow(x_ecal-0.,2)+pow(y_ecal-0.,2))/abs(z_ecal-0.));	
-	float eta = -1.0*TMath::Sign(1.0,z_ecal-0.)*log(tan(theta/2));
-
-	vector<float> etaphi;
-	etaphi.push_back(eta);
-	etaphi.push_back(phi);
-	return etaphi; 
-};
-
-
-
-//
-// member functions
-//
-
-// ------------ method called for each event  ------------
-void
-phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
-
-  using namespace edm;
-  //load event info
-  loadEvent(iEvent);
-
-  //reset branches
-  resetBranches();
-
-  
+// ------------ fill branches  ------------
+bool phase2L1EcalTimingAnalyzer::fillEventInfoBranches(const edm::Event& iEvent){
   //event info
   runNum   = iEvent.id().run();
   lumiNum  = iEvent.id().luminosityBlock();
   eventNum = iEvent.id().event();
-  
+
+  return true;
+};
+
+bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+
   edm::ESHandle<CaloGeometry> caloGeometryHandle;
   iSetup.get<CaloGeometryRecord>().get(caloGeometryHandle);
   const CaloGeometry* caloGeometry_ = caloGeometryHandle.product();  
@@ -723,7 +670,12 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	//std::cout<<"time " << tpg.time()<<std::endl;
 	}
     }
+  return true;
+};
 
+bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
+  //fill gen info
+  
   // Get genParticles
   std::vector<reco::GenParticle> genPiZeros;
   std::vector<reco::GenParticle> genParticles;
@@ -738,7 +690,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
        (abs((ptr)->pdgId()) == 2212 ) //protons
        || (abs((ptr)->pdgId()) >= 1 && abs((ptr)->pdgId()) <= 6 )//&& ( (ptr)->status() < 30 )) //quarks
        || (abs((ptr)->pdgId()) >= 11 && abs((ptr)->pdgId()) <= 16) //leptons
-       //|| (abs((ptr)->pdgId()) == 21) // && (ptr)->status() < 30) //gluons
+       || (abs((ptr)->pdgId()) == 21) // && (ptr)->status() < 30) //gluons
        || (abs((ptr)->pdgId()) >= 22 && abs((ptr)->pdgId()) <= 25) //&& ( (ptr)->status() < 30)) //gammas, z0, w, higgs
        || (abs((ptr)->pdgId()) >= 32 && abs((ptr)->pdgId()) <= 42) // other gauge and higgs bosons
        || (abs((ptr)->pdgId()) == 111 || abs((ptr)->pdgId()) == 211) // pi0 or pi+ pi-
@@ -779,7 +731,6 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 
   genVertexT = *genVertexTHandle;
 
-  //fill gen info
   nGenParticles = genParticles.size();
   for(unsigned int i = 0; i< genParticles.size(); i++){
     reco::GenParticle gen = genParticles[i];
@@ -1047,101 +998,241 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
     }//photons and pi0s 
 
   }//loop of gen
-/*
-  for(unsigned int i = 0; i< genParticles.size(); i++){
-	  reco::GenParticle gen = genParticles[i];
 
-	  int k1 = gParticleMotherIndex[i]; //mother index
+  return true;
+};
 
-	  int k11 = gParticleMotherIndex[k1]; // grand mother index
+bool phase2L1EcalTimingAnalyzer::fillGenak4JetBranches(){
 
-	 //grand mother info
-	 if(k1!=-666 && k11 != -666){
-	 	reco::GenParticle grandmom = genParticles[k11];
+  //ak4 gen jet info
+  //nGenak4Jets = genJetHandle->size();
+  for(const reco::GenJet &jet : *genak4JetHandle){
+	nGenak4Jets ++;
 
-		gParticleGrandMotherId[i] = genParticles[k11].pdgId();
-		gParticleGrandMotherIndex[i] = k11;
+	gak4JetMass[nGenak4Jets-1] = jet.mass();
+	gak4JetE[nGenak4Jets-1] = jet.energy();
+	gak4JetEt[nGenak4Jets-1] = jet.et();
+	gak4JetPt[nGenak4Jets-1] = jet.pt();
+	gak4JetPx[nGenak4Jets-1] = jet.px();
+	gak4JetPy[nGenak4Jets-1] = jet.py();
+	gak4JetPz[nGenak4Jets-1] = jet.pz();
+	gak4JetEta[nGenak4Jets-1] = jet.eta();
+	gak4JetPhi[nGenak4Jets-1] = jet.phi();
 
-        	gParticleGrandMotherE[i] = grandmom.energy();
-        	gParticleGrandMotherPt[i] = grandmom.pt();
-        	gParticleGrandMotherPx[i] = grandmom.px();
-        	gParticleGrandMotherPy[i] = grandmom.py();
-        	gParticleGrandMotherPz[i] = grandmom.pz();
-        	gParticleGrandMotherEta[i] = grandmom.eta();
-        	gParticleGrandMotherPhi[i] = grandmom.phi();
-        	gParticleGrandMotherDR[i] = deltaR(grandmom.eta(), grandmom.phi(), genParticles[i].eta(), genParticles[i].phi());
-		
-	 }
+	gak4JetArea[nGenak4Jets-1] = jet.jetArea();
 
-	  float mindr = 0.;
-	  for(unsigned int p = 0; p < genParticles.size(); p++)
-	  {	
-	  	int k2 = gParticleMotherIndex[p];
+	gak4JetPileupE[nGenak4Jets-1] = jet.pileup();
+	gak4JetPileupIdFlag[nGenak4Jets-1] = 0;
 
-		//float dr = deltaR(gParticleEta[i], gParticlePhi[i], gParticleEta[p], gParticlePhi[p]);
-		if(p!=i && k1==k2){
-			//if(dr > mindr){}
-			gParticleSiblingId[i] = genParticles[p].pdgId();
-			gParticleSiblingIndex[i] = p;
+	//gak4JetPassIdLoose[nGenak4Jets-1] = passJetID(&jet, 0);
+	//gak4JetPassIdTight[nGenak4Jets-1] = passJetID(&jet, 1);
 
-			//sibling info
-			int si = gParticleSiblingIndex[i];
-			if(si!=-666){
-		    		reco::GenParticle sibling = genParticles[si];
-		
-		        	gParticleSiblingE[i] = sibling.energy();
-		        	gParticleSiblingPt[i] = sibling.pt();
-		        	gParticleSiblingPx[i] = sibling.px();
-		        	gParticleSiblingPy[i] = sibling.py();
-		        	gParticleSiblingPz[i] = sibling.pz();
-		        	gParticleSiblingEta[i] = sibling.eta();
-		        	gParticleSiblingPhi[i] = sibling.phi();
-        			gParticleSiblingDR[i] = deltaR(sibling.eta(), sibling.phi(), genParticles[i].eta(), genParticles[i].phi());
-			}
-			//if(gParticleId[i]==22) std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i]  << " test id " << genParticles[p].pdgId() <<std::endl;
-			//if(gParticleId[i]==22) std::cout<<" mother index " << gParticleMotherIndex[i] << " test mother index " << gParticleMotherIndex[p] << " test num dau " << genParticles[p].numberOfDaughters() <<std::endl;
-		}
-	  }
+	gak4JetMuEnergy[nGenak4Jets-1] = jet.muonEnergy();
+	gak4JetEmEnergy[nGenak4Jets-1] = jet.emEnergy();
+	//gak4JetChargedEmEnergy[nGenak4Jets-1] = jet.chargedEmEnergy();
+	//gak4JetNeutralEmEnergy[nGenak4Jets-1] = jet.neutralEmEnergy();
+	gak4JetHadronEnergy[nGenak4Jets-1] = jet.hadEnergy();
+	//gak4JetChargedHadronEnergy[nGenak4Jets-1] = jet.chargedHadronEnergy();
+	//gak4JetNeutralHadronEnergy[nGenak4Jets-1] = jet.neutralHadronEnergy();
+
+	//std::cout<<" Gen ak4Jet " << nGenak4Jets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
+	//std::cout<<" Gen ak4Jet " << nGenak4Jets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
   }
-*/
-/*
 
-  //gen jet info
-  //nGenJets = genJetHandle->size();
-  for(const reco::GenJet &jet : *genJetHandle){
-  //for(auto& jet : *genJetHandle.product()){
-	nGenJets ++;
+  return true;
+};
 
-	gJetMass[nGenJets-1] = jet.mass();
-	gJetE[nGenJets-1] = jet.energy();
-	gJetEt[nGenJets-1] = jet.et();
-	gJetPt[nGenJets-1] = jet.pt();
-	gJetPx[nGenJets-1] = jet.px();
-	gJetPy[nGenJets-1] = jet.py();
-	gJetPz[nGenJets-1] = jet.pz();
-	gJetEta[nGenJets-1] = jet.eta();
-	gJetPhi[nGenJets-1] = jet.phi();
+bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 
-	gJetArea[nGenJets-1] = jet.jetArea();
+  //ak4 nonu gen jet info
+  //nGenak4JetNoNus = genJetHandle->size();
+  for(const reco::GenJet &jet : *genak4JetNoNuHandle){
+	nGenak4JetNoNus ++;
 
-	gJetPileupE[nGenJets-1] = jet.pileup();
-	gJetPileupIdFlag[nGenJets-1] = 0;
+	gak4JetNoNuMass[nGenak4JetNoNus-1] = jet.mass();
+	gak4JetNoNuE[nGenak4JetNoNus-1] = jet.energy();
+	gak4JetNoNuEt[nGenak4JetNoNus-1] = jet.et();
+	gak4JetNoNuPt[nGenak4JetNoNus-1] = jet.pt();
+	gak4JetNoNuPx[nGenak4JetNoNus-1] = jet.px();
+	gak4JetNoNuPy[nGenak4JetNoNus-1] = jet.py();
+	gak4JetNoNuPz[nGenak4JetNoNus-1] = jet.pz();
+	gak4JetNoNuEta[nGenak4JetNoNus-1] = jet.eta();
+	gak4JetNoNuPhi[nGenak4JetNoNus-1] = jet.phi();
 
-	//gJetPassIdLoose[nGenJets-1] = passJetID(&jet, 0);
-	//gJetPassIdTight[nGenJets-1] = passJetID(&jet, 1);
+	gak4JetNoNuArea[nGenak4JetNoNus-1] = jet.jetArea();
 
-	gJetMuEnergy[nGenJets-1] = jet.muonEnergy();
-	gJetEmEnergy[nGenJets-1] = jet.emEnergy();
-	//gJetChargedEmEnergy[nGenJets-1] = jet.chargedEmEnergy();
-	//gJetNeutralEmEnergy[nGenJets-1] = jet.neutralEmEnergy();
-	gJetHadronEnergy[nGenJets-1] = jet.hadEnergy();
-	//gJetChargedHadronEnergy[nGenJets-1] = jet.chargedHadronEnergy();
-	//gJetNeutralHadronEnergy[nGenJets-1] = jet.neutralHadronEnergy();
+	gak4JetNoNuPileupE[nGenak4JetNoNus-1] = jet.pileup();
+	gak4JetNoNuPileupIdFlag[nGenak4JetNoNus-1] = 0;
 
-	//std::cout<<" Gen Jet " << nGenJets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
-	//std::cout<<" Gen Jet " << nGenJets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
+	//gak4JetNoNuPassIdLoose[nGenak4JetNoNus-1] = passJetID(&jet, 0);
+	//gak4JetNoNuPassIdTight[nGenak4JetNoNus-1] = passJetID(&jet, 1);
+
+	gak4JetNoNuMuEnergy[nGenak4JetNoNus-1] = jet.muonEnergy();
+	gak4JetNoNuEmEnergy[nGenak4JetNoNus-1] = jet.emEnergy();
+	//gak4JetNoNuChargedEmEnergy[nGenak4JetNoNus-1] = jet.chargedEmEnergy();
+	//gak4JetNoNuNeutralEmEnergy[nGenak4JetNoNus-1] = jet.neutralEmEnergy();
+	gak4JetNoNuHadronEnergy[nGenak4JetNoNus-1] = jet.hadEnergy();
+	//gak4JetNoNuChargedHadronEnergy[nGenak4JetNoNus-1] = jet.chargedHadronEnergy();
+	//gak4JetNoNuNeutralHadronEnergy[nGenak4JetNoNus-1] = jet.neutralHadronEnergy();
+
+	//std::cout<<" Gen ak4JetNoNu " << nGenak4JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
+	//std::cout<<" Gen ak4JetNoNu " << nGenak4JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
   }
-*/
+
+  return true;
+};
+
+bool phase2L1EcalTimingAnalyzer::fillGenak8JetBranches(){
+
+  //ak8 gen jet info
+  //nGenak8Jets = genJetHandle->size();
+  for(const reco::GenJet &jet : *genak8JetHandle){
+	nGenak8Jets ++;
+
+	gak8JetMass[nGenak8Jets-1] = jet.mass();
+	gak8JetE[nGenak8Jets-1] = jet.energy();
+	gak8JetEt[nGenak8Jets-1] = jet.et();
+	gak8JetPt[nGenak8Jets-1] = jet.pt();
+	gak8JetPx[nGenak8Jets-1] = jet.px();
+	gak8JetPy[nGenak8Jets-1] = jet.py();
+	gak8JetPz[nGenak8Jets-1] = jet.pz();
+	gak8JetEta[nGenak8Jets-1] = jet.eta();
+	gak8JetPhi[nGenak8Jets-1] = jet.phi();
+
+	gak8JetArea[nGenak8Jets-1] = jet.jetArea();
+
+	gak8JetPileupE[nGenak8Jets-1] = jet.pileup();
+	gak8JetPileupIdFlag[nGenak8Jets-1] = 0;
+
+	//gak8JetPassIdLoose[nGenak8Jets-1] = passJetID(&jet, 0);
+	//gak8JetPassIdTight[nGenak8Jets-1] = passJetID(&jet, 1);
+
+	gak8JetMuEnergy[nGenak8Jets-1] = jet.muonEnergy();
+	gak8JetEmEnergy[nGenak8Jets-1] = jet.emEnergy();
+	//gak8JetChargedEmEnergy[nGenak8Jets-1] = jet.chargedEmEnergy();
+	//gak8JetNeutralEmEnergy[nGenak8Jets-1] = jet.neutralEmEnergy();
+	gak8JetHadronEnergy[nGenak8Jets-1] = jet.hadEnergy();
+	//gak8JetChargedHadronEnergy[nGenak8Jets-1] = jet.chargedHadronEnergy();
+	//gak8JetNeutralHadronEnergy[nGenak8Jets-1] = jet.neutralHadronEnergy();
+
+	//std::cout<<" Gen ak8Jet " << nGenak8Jets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
+	//std::cout<<" Gen ak8Jet " << nGenak8Jets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
+  }
+
+  return true;
+};
+
+bool phase2L1EcalTimingAnalyzer::fillGenak8JetNoNuBranches(){
+
+  //ak8 nonu gen jet info
+  //nGenak8JetNoNus = genJetHandle->size();
+  for(const reco::GenJet &jet : *genak8JetNoNuHandle){
+	nGenak8JetNoNus ++;
+
+	gak8JetNoNuMass[nGenak8JetNoNus-1] = jet.mass();
+	gak8JetNoNuE[nGenak8JetNoNus-1] = jet.energy();
+	gak8JetNoNuEt[nGenak8JetNoNus-1] = jet.et();
+	gak8JetNoNuPt[nGenak8JetNoNus-1] = jet.pt();
+	gak8JetNoNuPx[nGenak8JetNoNus-1] = jet.px();
+	gak8JetNoNuPy[nGenak8JetNoNus-1] = jet.py();
+	gak8JetNoNuPz[nGenak8JetNoNus-1] = jet.pz();
+	gak8JetNoNuEta[nGenak8JetNoNus-1] = jet.eta();
+	gak8JetNoNuPhi[nGenak8JetNoNus-1] = jet.phi();
+
+	gak8JetNoNuArea[nGenak8JetNoNus-1] = jet.jetArea();
+
+	gak8JetNoNuPileupE[nGenak8JetNoNus-1] = jet.pileup();
+	gak8JetNoNuPileupIdFlag[nGenak8JetNoNus-1] = 0;
+
+	//gak8JetNoNuPassIdLoose[nGenak8JetNoNus-1] = passJetID(&jet, 0);
+	//gak8JetNoNuPassIdTight[nGenak8JetNoNus-1] = passJetID(&jet, 1);
+
+	gak8JetNoNuMuEnergy[nGenak8JetNoNus-1] = jet.muonEnergy();
+	gak8JetNoNuEmEnergy[nGenak8JetNoNus-1] = jet.emEnergy();
+	//gak8JetNoNuChargedEmEnergy[nGenak8JetNoNus-1] = jet.chargedEmEnergy();
+	//gak8JetNoNuNeutralEmEnergy[nGenak8JetNoNus-1] = jet.neutralEmEnergy();
+	gak8JetNoNuHadronEnergy[nGenak8JetNoNus-1] = jet.hadEnergy();
+	//gak8JetNoNuChargedHadronEnergy[nGenak8JetNoNus-1] = jet.chargedHadronEnergy();
+	//gak8JetNoNuNeutralHadronEnergy[nGenak8JetNoNus-1] = jet.neutralHadronEnergy();
+
+	//std::cout<<" Gen ak8JetNoNu " << nGenak8JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
+	//std::cout<<" Gen ak8JetNoNu " << nGenak8JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
+  }
+
+  return true;
+};
+
+// ------------corr eta phi  ------------
+vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen){
+	//X, Y, Z are for PV
+
+	//gen
+	float E = gen.energy();
+	float Pt = gen.pt();
+	float Px = gen.px();
+	float Py = gen.py();
+	float Pz = gen.pz();
+	float Phi = gen.phi();
+	float Eta = gen.eta();
+
+	float x_ecal = 0.;
+	float y_ecal = 0.;
+	float z_ecal = 0.;
+
+	float radius = sqrt( pow(X,2) + pow(Y,2) ); 
+	float radius_ecal = 129.0; //cm
+
+	float t_ecal = (1/30.)*(radius_ecal-radius)/(Pt/E);
+	
+	x_ecal = X + 30.*(Px/E)*t_ecal;
+	y_ecal = Y + 30.*(Py/E)*t_ecal;
+	z_ecal = Z + 30.*(Pz/E)*t_ecal;
+
+	//corrections of phi and eta wrt origin
+	float phi = atan((y_ecal-0.)/(x_ecal-X-0.));
+	if(x_ecal < 0.0) phi = TMath::Pi() + phi;
+
+	phi = dPhi(phi, 0.);
+
+	float theta = atan(sqrt(pow(x_ecal-0.,2)+pow(y_ecal-0.,2))/abs(z_ecal-0.));	
+	float eta = -1.0*TMath::Sign(1.0,z_ecal-0.)*log(tan(theta/2));
+
+	vector<float> etaphi;
+	etaphi.push_back(eta);
+	etaphi.push_back(phi);
+	return etaphi; 
+};
+
+
+
+//
+// member functions
+//
+
+// ------------ method called for each event  ------------
+void
+phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+
+  using namespace edm;
+  //load event info
+  loadEvent(iEvent);
+
+  //reset branches
+  resetBranches();
+
+  //fill branches
+  // fill event info
+  fillEventInfoBranches(iEvent);
+  //ecal barrel crystals
+  fillEBCrystalBranches(iEvent, iSetup);
+  //fill gen info
+  fillGenParticleBranches();
+  //fill jet info
+  fillGenak4JetBranches();
+  fillGenak4JetNoNuBranches();
+  fillGenak8JetBranches();
+  fillGenak8JetNoNuBranches();
 
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;

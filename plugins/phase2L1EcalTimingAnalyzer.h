@@ -147,6 +147,15 @@ public:
   void resetGenak8JetBranches();
   void resetGenak8JetNoNuBranches();
 
+// ------------ fill branches  ------------
+  bool fillEventInfoBranches(const edm::Event& iEvent);
+  bool fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+  bool fillGenParticleBranches();
+  bool fillGenak4JetBranches();
+  bool fillGenak4JetNoNuBranches();
+  bool fillGenak8JetBranches();
+  bool fillGenak8JetNoNuBranches();
+
 // ------------corr eta phi  ------------
   vector<float> EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen);
 
