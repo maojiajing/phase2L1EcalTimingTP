@@ -132,14 +132,20 @@ public:
   void enableEventInfoBranches();
   void enableEBCrystalBranches();
   void enableGenParticleBranches();
-  void enableGenJetBranches();
+  void enableGenak4JetBranches();
+  void enableGenak4JetNoNuBranches();
+  void enableGenak8JetBranches();
+  void enableGenak8JetNoNuBranches();
 
 // ------------ reset branches  ------------
   virtual void resetBranches();
   void resetEventInfoBranches();
   void resetEBCrystalBranches();
   void resetGenParticleBranches();
-  void resetGenJetBranches();
+  void resetGenak4JetBranches();
+  void resetGenak4JetNoNuBranches();
+  void resetGenak8JetBranches();
+  void resetGenak8JetNoNuBranches();
 
 // ------------corr eta phi  ------------
   vector<float> EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen);
@@ -157,17 +163,26 @@ private:
   const CaloSubdetectorGeometry * ebGeometry;
   edm::ESHandle<CaloGeometry> caloGeometry_;
 
-  edm::EDGetTokenT<std::vector<reco::GenJet> > genJetToken_;
+  edm::EDGetTokenT<std::vector<reco::GenJet> > genak4JetToken_;
+  edm::EDGetTokenT<std::vector<reco::GenJet> > genak4JetNoNuToken_;
+  edm::EDGetTokenT<std::vector<reco::GenJet> > genak8JetToken_;
+  edm::EDGetTokenT<std::vector<reco::GenJet> > genak8JetNoNuToken_;
   edm::EDGetTokenT<std::vector<reco::GenParticle> > genToken_;
   edm::EDGetTokenT<float> genTokenT_;
   edm::EDGetTokenT<EcalEBTrigPrimDigiCollection> ecalTPGBToken_;
 
   edm::Handle<EcalEBTrigPrimDigiCollection> ecaltpgCollection;
-  edm::Handle<GenJetCollectionType> genJetHandle;
+  edm::Handle<GenJetCollectionType> genak4JetHandle;
+  edm::Handle<GenJetCollectionType> genak4JetNoNuHandle;
+  edm::Handle<GenJetCollectionType> genak8JetHandle;
+  edm::Handle<GenJetCollectionType> genak8JetNoNuHandle;
   edm::Handle<GenParticleCollectionType> genParticleHandle;
   edm::Handle<float> genVertexTHandle;
 
-  edm::InputTag genSrcJ_;
+  edm::InputTag genSrcak4J_;
+  edm::InputTag genSrcak4JN_;
+  edm::InputTag genSrcak8J_;
+  edm::InputTag genSrcak8JN_;
   edm::InputTag genSrc_;
   edm::InputTag genSrcT_;
 
@@ -191,35 +206,121 @@ private:
  float eb_cell_Eta[EBCRYSTALARRAYSIZE];
  float eb_cell_Phi[EBCRYSTALARRAYSIZE];
 
- //jet info
- int nGenJets;
+ //ak4 jet info
+ int nGenak4Jets;
 
- float gJetMass[GENJETARRAYSIZE];
- float gJetE[GENJETARRAYSIZE];
- float gJetEt[GENJETARRAYSIZE];
- float gJetPt[GENJETARRAYSIZE];
- float gJetPx[GENJETARRAYSIZE];
- float gJetPy[GENJETARRAYSIZE];
- float gJetPz[GENJETARRAYSIZE];
- float gJetEta[GENJETARRAYSIZE];
- float gJetPhi[GENJETARRAYSIZE];
+ float gak4JetMass[GENJETARRAYSIZE];
+ float gak4JetE[GENJETARRAYSIZE];
+ float gak4JetEt[GENJETARRAYSIZE];
+ float gak4JetPt[GENJETARRAYSIZE];
+ float gak4JetPx[GENJETARRAYSIZE];
+ float gak4JetPy[GENJETARRAYSIZE];
+ float gak4JetPz[GENJETARRAYSIZE];
+ float gak4JetEta[GENJETARRAYSIZE];
+ float gak4JetPhi[GENJETARRAYSIZE];
 
- float gJetArea[GENJETARRAYSIZE];
+ float gak4JetArea[GENJETARRAYSIZE];
 
- float gJetPileupE[GENJETARRAYSIZE];
- int gJetPileupIdFlag[GENJETARRAYSIZE];
+ float gak4JetPileupE[GENJETARRAYSIZE];
+ int gak4JetPileupIdFlag[GENJETARRAYSIZE];
 
- bool gJetPassIdLoose[GENJETARRAYSIZE];
- bool gJetPassIdTight[GENJETARRAYSIZE];
+ bool gak4JetPassIdLoose[GENJETARRAYSIZE];
+ bool gak4JetPassIdTight[GENJETARRAYSIZE];
 
- float gJetMuEnergy[GENJETARRAYSIZE];
- float gJetEleFrac[GENJETARRAYSIZE];
- float gJetEmEnergy[GENJETARRAYSIZE];
- float gJetChargedEmEnergy[GENJETARRAYSIZE];
- float gJetNeutralEmEnergy[GENJETARRAYSIZE];
- float gJetHadronEnergy[GENJETARRAYSIZE];
- float gJetChargedHadronEnergy[GENJETARRAYSIZE];
- float gJetNeutralHadronEnergy[GENJETARRAYSIZE];
+ float gak4JetMuEnergy[GENJETARRAYSIZE];
+ float gak4JetEmEnergy[GENJETARRAYSIZE];
+ float gak4JetChargedEmEnergy[GENJETARRAYSIZE];
+ float gak4JetNeutralEmEnergy[GENJETARRAYSIZE];
+ float gak4JetHadronEnergy[GENJETARRAYSIZE];
+ float gak4JetChargedHadronEnergy[GENJETARRAYSIZE];
+ float gak4JetNeutralHadronEnergy[GENJETARRAYSIZE];
+
+ // ak4 jet nonu info
+ int nGenak4JetNoNus;
+
+ float gak4JetNoNuMass[GENJETARRAYSIZE];
+ float gak4JetNoNuE[GENJETARRAYSIZE];
+ float gak4JetNoNuEt[GENJETARRAYSIZE];
+ float gak4JetNoNuPt[GENJETARRAYSIZE];
+ float gak4JetNoNuPx[GENJETARRAYSIZE];
+ float gak4JetNoNuPy[GENJETARRAYSIZE];
+ float gak4JetNoNuPz[GENJETARRAYSIZE];
+ float gak4JetNoNuEta[GENJETARRAYSIZE];
+ float gak4JetNoNuPhi[GENJETARRAYSIZE];
+
+ float gak4JetNoNuArea[GENJETARRAYSIZE];
+
+ float gak4JetNoNuPileupE[GENJETARRAYSIZE];
+ int gak4JetNoNuPileupIdFlag[GENJETARRAYSIZE];
+
+ bool gak4JetNoNuPassIdLoose[GENJETARRAYSIZE];
+ bool gak4JetNoNuPassIdTight[GENJETARRAYSIZE];
+
+ float gak4JetNoNuMuEnergy[GENJETARRAYSIZE];
+ float gak4JetNoNuEmEnergy[GENJETARRAYSIZE];
+ float gak4JetNoNuChargedEmEnergy[GENJETARRAYSIZE];
+ float gak4JetNoNuNeutralEmEnergy[GENJETARRAYSIZE];
+ float gak4JetNoNuHadronEnergy[GENJETARRAYSIZE];
+ float gak4JetNoNuChargedHadronEnergy[GENJETARRAYSIZE];
+ float gak4JetNoNuNeutralHadronEnergy[GENJETARRAYSIZE];
+
+ // ak8 jet info
+ int nGenak8Jets;
+
+ float gak8JetMass[GENJETARRAYSIZE];
+ float gak8JetE[GENJETARRAYSIZE];
+ float gak8JetEt[GENJETARRAYSIZE];
+ float gak8JetPt[GENJETARRAYSIZE];
+ float gak8JetPx[GENJETARRAYSIZE];
+ float gak8JetPy[GENJETARRAYSIZE];
+ float gak8JetPz[GENJETARRAYSIZE];
+ float gak8JetEta[GENJETARRAYSIZE];
+ float gak8JetPhi[GENJETARRAYSIZE];
+
+ float gak8JetArea[GENJETARRAYSIZE];
+
+ float gak8JetPileupE[GENJETARRAYSIZE];
+ int gak8JetPileupIdFlag[GENJETARRAYSIZE];
+
+ bool gak8JetPassIdLoose[GENJETARRAYSIZE];
+ bool gak8JetPassIdTight[GENJETARRAYSIZE];
+
+ float gak8JetMuEnergy[GENJETARRAYSIZE];
+ float gak8JetEmEnergy[GENJETARRAYSIZE];
+ float gak8JetChargedEmEnergy[GENJETARRAYSIZE];
+ float gak8JetNeutralEmEnergy[GENJETARRAYSIZE];
+ float gak8JetHadronEnergy[GENJETARRAYSIZE];
+ float gak8JetChargedHadronEnergy[GENJETARRAYSIZE];
+ float gak8JetNeutralHadronEnergy[GENJETARRAYSIZE];
+
+ // ak8 jet nonu info
+ int nGenak8JetNoNus;
+
+ float gak8JetNoNuMass[GENJETARRAYSIZE];
+ float gak8JetNoNuE[GENJETARRAYSIZE];
+ float gak8JetNoNuEt[GENJETARRAYSIZE];
+ float gak8JetNoNuPt[GENJETARRAYSIZE];
+ float gak8JetNoNuPx[GENJETARRAYSIZE];
+ float gak8JetNoNuPy[GENJETARRAYSIZE];
+ float gak8JetNoNuPz[GENJETARRAYSIZE];
+ float gak8JetNoNuEta[GENJETARRAYSIZE];
+ float gak8JetNoNuPhi[GENJETARRAYSIZE];
+
+ float gak8JetNoNuArea[GENJETARRAYSIZE];
+
+ float gak8JetNoNuPileupE[GENJETARRAYSIZE];
+ int gak8JetNoNuPileupIdFlag[GENJETARRAYSIZE];
+
+ bool gak8JetNoNuPassIdLoose[GENJETARRAYSIZE];
+ bool gak8JetNoNuPassIdTight[GENJETARRAYSIZE];
+
+ float gak8JetNoNuMuEnergy[GENJETARRAYSIZE];
+ float gak8JetNoNuEmEnergy[GENJETARRAYSIZE];
+ float gak8JetNoNuChargedEmEnergy[GENJETARRAYSIZE];
+ float gak8JetNoNuNeutralEmEnergy[GENJETARRAYSIZE];
+ float gak8JetNoNuHadronEnergy[GENJETARRAYSIZE];
+ float gak8JetNoNuChargedHadronEnergy[GENJETARRAYSIZE];
+ float gak8JetNoNuNeutralHadronEnergy[GENJETARRAYSIZE];
 
  //gen info
  int nGenParticles;

@@ -31,13 +31,19 @@
 //
 phase2L1EcalTimingAnalyzer::phase2L1EcalTimingAnalyzer(const edm::ParameterSet& cfg):
   ecalTPGBToken_(   consumes<EcalEBTrigPrimDigiCollection>(cfg.getParameter<edm::InputTag>("ecalTPGsBarrel"))),
-  genSrcJ_ ((        cfg.getParameter<edm::InputTag>( "ak4GenJets"))),
+  genSrcak4J_ ((        cfg.getParameter<edm::InputTag>( "ak4GenJets"))),
+  genSrcak4JN_ ((        cfg.getParameter<edm::InputTag>( "ak4GenJetsNoNu"))),
+  genSrcak8J_ ((        cfg.getParameter<edm::InputTag>( "ak8GenJets"))),
+  genSrcak8JN_ ((        cfg.getParameter<edm::InputTag>( "ak8GenJetsNoNu"))),
   genSrc_ ((        cfg.getParameter<edm::InputTag>( "genParticles"))),
   genSrcT_ ((        cfg.getParameter<edm::InputTag>( "genParticles_t0")))
 {
   //now do what ever initialization is needed
   usesResource("TFileService");
-  genJetToken_ =     consumes<std::vector<reco::GenJet> >(genSrcJ_);
+  genak4JetToken_ =     consumes<std::vector<reco::GenJet> >(genSrcak4J_);
+  genak4JetNoNuToken_ =     consumes<std::vector<reco::GenJet> >(genSrcak4JN_);
+  genak8JetToken_ =     consumes<std::vector<reco::GenJet> >(genSrcak8J_);
+  genak8JetNoNuToken_ =     consumes<std::vector<reco::GenJet> >(genSrcak8JN_);
   genToken_ =     consumes<std::vector<reco::GenParticle> >(genSrc_);
   genTokenT_ =     consumes<float>(genSrcT_);
   
@@ -61,10 +67,28 @@ void phase2L1EcalTimingAnalyzer::loadEvent(const edm::Event& iEvent){
   //control plot for ecal crystals
   iEvent.getByToken( ecalTPGBToken_, ecaltpgCollection);
 
-  if(!iEvent.getByToken(genJetToken_,genJetHandle))
-    std::cout<<"No gen jets Found "<<std::endl;
+  if(!iEvent.getByToken(genak4JetToken_,genak4JetHandle))
+    std::cout<<"No gen ak4 jets Found "<<std::endl;
   else{
-    //std::cout<<"Gen Jets size "<<genJetHandle->size()<<std::endl;
+    //std::cout<<"Gen i ak4 Jets size "<<genak4JetHandle->size()<<std::endl;
+  }
+	
+  if(!iEvent.getByToken(genak4JetNoNuToken_,genak4JetNoNuHandle))
+    std::cout<<"No gen ak4 nonu jets Found "<<std::endl;
+  else{
+    //std::cout<<"Gen ak4 nonu Jets size "<<genak4JetNoNuHandle->size()<<std::endl;
+  }
+	
+  if(!iEvent.getByToken(genak8JetToken_,genak8JetHandle))
+    std::cout<<"No gen ak8 jets Found "<<std::endl;
+  else{
+    //std::cout<<"Gen ak8 Jets size "<<genak8JetHandle->size()<<std::endl;
+  }
+	
+  if(!iEvent.getByToken(genak8JetNoNuToken_,genak8JetNoNuHandle))
+    std::cout<<"No gen ak8 nonu jets Found "<<std::endl;
+  else{
+    //std::cout<<"Gen ak8 nonu Jets size "<<genak8JetNoNuHandle->size()<<std::endl;
   }
 	
   if(!iEvent.getByToken(genToken_,genParticleHandle))
@@ -87,7 +111,10 @@ void phase2L1EcalTimingAnalyzer::setBranches(){
   enableEventInfoBranches();
   enableEBCrystalBranches();
   enableGenParticleBranches();
-  enableGenJetBranches();
+  enableGenak4JetBranches();
+  enableGenak4JetNoNuBranches();
+  enableGenak8JetBranches();
+  enableGenak8JetNoNuBranches();
 };
 
 void phase2L1EcalTimingAnalyzer::enableEventInfoBranches(){
@@ -187,46 +214,148 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
 
 };
 
-void phase2L1EcalTimingAnalyzer::enableGenJetBranches(){
+void phase2L1EcalTimingAnalyzer::enableGenak4JetBranches(){
  //jet info
- ecalTPTree->Branch("nGenJets", &nGenJets, "nGenJets/I");
+ ecalTPTree->Branch("nGenak4Jets", &nGenak4Jets, "nGenak4Jets/I");
 
- ecalTPTree->Branch("gJetMass", &gJetMass, "gJetMass[nGenJets]/F");
- ecalTPTree->Branch("gJetE", &gJetE, "gJetE[nGenJets]/F");
- ecalTPTree->Branch("gJetEt", &gJetEt, "gJetEt[nGenJets]/F");
- ecalTPTree->Branch("gJetPt", &gJetPt, "gJetPt[nGenJets]/F");
- ecalTPTree->Branch("gJetPx", &gJetPx, "gJetPx[nGenJets]/F");
- ecalTPTree->Branch("gJetPy", &gJetPy, "gJetPy[nGenJets]/F");
- ecalTPTree->Branch("gJetPz", &gJetPz, "gJetPz[nGenJets]/F");
- ecalTPTree->Branch("gJetEta", &gJetEta, "gJetEta[nGenJets]/F");
- ecalTPTree->Branch("gJetPhi", &gJetPhi, "gJetPhi[nGenJets]/F");
+ ecalTPTree->Branch("gak4JetMass", &gak4JetMass, "gak4JetMass[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetE", &gak4JetE, "gak4JetE[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetEt", &gak4JetEt, "gak4JetEt[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetPt", &gak4JetPt, "gak4JetPt[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetPx", &gak4JetPx, "gak4JetPx[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetPy", &gak4JetPy, "gak4JetPy[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetPz", &gak4JetPz, "gak4JetPz[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetEta", &gak4JetEta, "gak4JetEta[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetPhi", &gak4JetPhi, "gak4JetPhi[nGenak4Jets]/F");
 
- ecalTPTree->Branch("gJetArea", &gJetArea, "gJetArea[nGenJets]/F");
+ ecalTPTree->Branch("gak4JetArea", &gak4JetArea, "gak4JetArea[nGenak4Jets]/F");
 
- ecalTPTree->Branch("gJetPileupE", &gJetPileupE, "gJetPileupE[nGenJets]/F");
- ecalTPTree->Branch("gJetPileupIdFlag", &gJetPileupIdFlag, "gJetPileupIdFlag[nGenJets]/I");
+ ecalTPTree->Branch("gak4JetPileupE", &gak4JetPileupE, "gak4JetPileupE[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetPileupIdFlag", &gak4JetPileupIdFlag, "gak4JetPileupIdFlag[nGenak4Jets]/I");
 
- ecalTPTree->Branch("gJetPassIdLoose", &gJetPassIdLoose, "gJetPassIdLoose[nGenJets]/O");
- ecalTPTree->Branch("gJetPassIdTight", &gJetPassIdTight, "gJetPassIdTight[nGenJets]/O");
+ ecalTPTree->Branch("gak4JetPassIdLoose", &gak4JetPassIdLoose, "gak4JetPassIdLoose[nGenak4Jets]/O");
+ ecalTPTree->Branch("gak4JetPassIdTight", &gak4JetPassIdTight, "gak4JetPassIdTight[nGenak4Jets]/O");
 
 
- ecalTPTree->Branch("gJetMuEnergy", &gJetMuEnergy, "gJetMuEnergy[nGenJets]/F");
- ecalTPTree->Branch("gJetEleFrac", &gJetEleFrac, "gJetEleFrac[nGenJets]/F");
- ecalTPTree->Branch("gJetEmEnergy", &gJetEmEnergy, "gJetEmEnergy[nGenJets]/F");
- ecalTPTree->Branch("gJetChargedEmEnergy", &gJetChargedEmEnergy, "gJetChargedEmEnergy[nGenJets]/F");
- ecalTPTree->Branch("gJetNeutralEmEnergy", &gJetNeutralEmEnergy, "gJetNeutralEmEnergy[nGenJets]/F");
- ecalTPTree->Branch("gJetHadronEnergy", &gJetHadronEnergy, "gJetHadronEnergy[nGenJets]/F");
- ecalTPTree->Branch("gJetChargedHadronEnergy", &gJetChargedHadronEnergy, "gJetChargedHadronEnergy[nGenJets]/F");
- ecalTPTree->Branch("gJetNeutralHadronEnergy", &gJetNeutralHadronEnergy, "gJetNeutralHadronEnergy[nGenJets]/F");
+ ecalTPTree->Branch("gak4JetMuEnergy", &gak4JetMuEnergy, "gak4JetMuEnergy[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetEmEnergy", &gak4JetEmEnergy, "gak4JetEmEnergy[nGenak4Jets]/F");
+ //ecalTPTree->Branch("gak4JetChargedEmEnergy", &gak4JetChargedEmEnergy, "gak4JetChargedEmEnergy[nGenak4Jets]/F");
+ //ecalTPTree->Branch("gak4JetNeutralEmEnergy", &gak4JetNeutralEmEnergy, "gak4JetNeutralEmEnergy[nGenak4Jets]/F");
+ ecalTPTree->Branch("gak4JetHadronEnergy", &gak4JetHadronEnergy, "gak4JetHadronEnergy[nGenak4Jets]/F");
+ //ecalTPTree->Branch("gak4JetChargedHadronEnergy", &gak4JetChargedHadronEnergy, "gak4JetChargedHadronEnergy[nGenak4Jets]/F");
+ //ecalTPTree->Branch("gak4JetNeutralHadronEnergy", &gak4JetNeutralHadronEnergy, "gak4JetNeutralHadronEnergy[nGenak4Jets]/F");
 
 };
+
+void phase2L1EcalTimingAnalyzer::enableGenak4JetNoNuBranches(){
+ //jet info
+ ecalTPTree->Branch("nGenak4JetNoNus", &nGenak4JetNoNus, "nGenak4JetNoNus/I");
+
+ ecalTPTree->Branch("gak4JetNoNuMass", &gak4JetNoNuMass, "gak4JetNoNuMass[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuE", &gak4JetNoNuE, "gak4JetNoNuE[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEt", &gak4JetNoNuEt, "gak4JetNoNuEt[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuPt", &gak4JetNoNuPt, "gak4JetNoNuPt[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuPx", &gak4JetNoNuPx, "gak4JetNoNuPx[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuPy", &gak4JetNoNuPy, "gak4JetNoNuPy[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuPz", &gak4JetNoNuPz, "gak4JetNoNuPz[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEta", &gak4JetNoNuEta, "gak4JetNoNuEta[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuPhi", &gak4JetNoNuPhi, "gak4JetNoNuPhi[nGenak4JetNoNus]/F");
+
+ ecalTPTree->Branch("gak4JetNoNuArea", &gak4JetNoNuArea, "gak4JetNoNuArea[nGenak4JetNoNus]/F");
+
+ ecalTPTree->Branch("gak4JetNoNuPileupE", &gak4JetNoNuPileupE, "gak4JetNoNuPileupE[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuPileupIdFlag", &gak4JetNoNuPileupIdFlag, "gak4JetNoNuPileupIdFlag[nGenak4JetNoNus]/I");
+
+ ecalTPTree->Branch("gak4JetNoNuPassIdLoose", &gak4JetNoNuPassIdLoose, "gak4JetNoNuPassIdLoose[nGenak4JetNoNus]/O");
+ ecalTPTree->Branch("gak4JetNoNuPassIdTight", &gak4JetNoNuPassIdTight, "gak4JetNoNuPassIdTight[nGenak4JetNoNus]/O");
+
+
+ ecalTPTree->Branch("gak4JetNoNuMuEnergy", &gak4JetNoNuMuEnergy, "gak4JetNoNuMuEnergy[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEmEnergy", &gak4JetNoNuEmEnergy, "gak4JetNoNuEmEnergy[nGenak4JetNoNus]/F");
+ //ecalTPTree->Branch("gak4JetNoNuChargedEmEnergy", &gak4JetNoNuChargedEmEnergy, "gak4JetNoNuChargedEmEnergy[nGenak4JetNoNus]/F");
+ //ecalTPTree->Branch("gak4JetNoNuNeutralEmEnergy", &gak4JetNoNuNeutralEmEnergy, "gak4JetNoNuNeutralEmEnergy[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuHadronEnergy", &gak4JetNoNuHadronEnergy, "gak4JetNoNuHadronEnergy[nGenak4JetNoNus]/F");
+ //ecalTPTree->Branch("gak4JetNoNuChargedHadronEnergy", &gak4JetNoNuChargedHadronEnergy, "gak4JetNoNuChargedHadronEnergy[nGenak4JetNoNus]/F");
+ //ecalTPTree->Branch("gak4JetNoNuNeutralHadronEnergy", &gak4JetNoNuNeutralHadronEnergy, "gak4JetNoNuNeutralHadronEnergy[nGenak4JetNoNus]/F");
+
+};
+
+void phase2L1EcalTimingAnalyzer::enableGenak8JetBranches(){
+ //jet info
+ ecalTPTree->Branch("nGenak8Jets", &nGenak8Jets, "nGenak8Jets/I");
+
+ ecalTPTree->Branch("gak8JetMass", &gak8JetMass, "gak8JetMass[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetE", &gak8JetE, "gak8JetE[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetEt", &gak8JetEt, "gak8JetEt[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetPt", &gak8JetPt, "gak8JetPt[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetPx", &gak8JetPx, "gak8JetPx[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetPy", &gak8JetPy, "gak8JetPy[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetPz", &gak8JetPz, "gak8JetPz[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetEta", &gak8JetEta, "gak8JetEta[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetPhi", &gak8JetPhi, "gak8JetPhi[nGenak8Jets]/F");
+
+ ecalTPTree->Branch("gak8JetArea", &gak8JetArea, "gak8JetArea[nGenak8Jets]/F");
+
+ ecalTPTree->Branch("gak8JetPileupE", &gak8JetPileupE, "gak8JetPileupE[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetPileupIdFlag", &gak8JetPileupIdFlag, "gak8JetPileupIdFlag[nGenak8Jets]/I");
+
+ ecalTPTree->Branch("gak8JetPassIdLoose", &gak8JetPassIdLoose, "gak8JetPassIdLoose[nGenak8Jets]/O");
+ ecalTPTree->Branch("gak8JetPassIdTight", &gak8JetPassIdTight, "gak8JetPassIdTight[nGenak8Jets]/O");
+
+
+ ecalTPTree->Branch("gak8JetMuEnergy", &gak8JetMuEnergy, "gak8JetMuEnergy[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetEmEnergy", &gak8JetEmEnergy, "gak8JetEmEnergy[nGenak8Jets]/F");
+ //ecalTPTree->Branch("gak8JetChargedEmEnergy", &gak8JetChargedEmEnergy, "gak8JetChargedEmEnergy[nGenak8Jets]/F");
+ //ecalTPTree->Branch("gak8JetNeutralEmEnergy", &gak8JetNeutralEmEnergy, "gak8JetNeutralEmEnergy[nGenak8Jets]/F");
+ ecalTPTree->Branch("gak8JetHadronEnergy", &gak8JetHadronEnergy, "gak8JetHadronEnergy[nGenak8Jets]/F");
+ //ecalTPTree->Branch("gak8JetChargedHadronEnergy", &gak8JetChargedHadronEnergy, "gak8JetChargedHadronEnergy[nGenak8Jets]/F");
+ //ecalTPTree->Branch("gak8JetNeutralHadronEnergy", &gak8JetNeutralHadronEnergy, "gak8JetNeutralHadronEnergy[nGenak8Jets]/F");
+
+};
+
+void phase2L1EcalTimingAnalyzer::enableGenak8JetNoNuBranches(){
+ //jet info
+ ecalTPTree->Branch("nGenak8JetNoNus", &nGenak8JetNoNus, "nGenak8JetNoNus/I");
+
+ ecalTPTree->Branch("gak8JetNoNuMass", &gak8JetNoNuMass, "gak8JetNoNuMass[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuE", &gak8JetNoNuE, "gak8JetNoNuE[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuEt", &gak8JetNoNuEt, "gak8JetNoNuEt[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuPt", &gak8JetNoNuPt, "gak8JetNoNuPt[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuPx", &gak8JetNoNuPx, "gak8JetNoNuPx[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuPy", &gak8JetNoNuPy, "gak8JetNoNuPy[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuPz", &gak8JetNoNuPz, "gak8JetNoNuPz[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuEta", &gak8JetNoNuEta, "gak8JetNoNuEta[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuPhi", &gak8JetNoNuPhi, "gak8JetNoNuPhi[nGenak8JetNoNus]/F");
+
+ ecalTPTree->Branch("gak8JetNoNuArea", &gak8JetNoNuArea, "gak8JetNoNuArea[nGenak8JetNoNus]/F");
+
+ ecalTPTree->Branch("gak8JetNoNuPileupE", &gak8JetNoNuPileupE, "gak8JetNoNuPileupE[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuPileupIdFlag", &gak8JetNoNuPileupIdFlag, "gak8JetNoNuPileupIdFlag[nGenak8JetNoNus]/I");
+
+ ecalTPTree->Branch("gak8JetNoNuPassIdLoose", &gak8JetNoNuPassIdLoose, "gak8JetNoNuPassIdLoose[nGenak8JetNoNus]/O");
+ ecalTPTree->Branch("gak8JetNoNuPassIdTight", &gak8JetNoNuPassIdTight, "gak8JetNoNuPassIdTight[nGenak8JetNoNus]/O");
+
+
+ ecalTPTree->Branch("gak8JetNoNuMuEnergy", &gak8JetNoNuMuEnergy, "gak8JetNoNuMuEnergy[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuEmEnergy", &gak8JetNoNuEmEnergy, "gak8JetNoNuEmEnergy[nGenak8JetNoNus]/F");
+ //ecalTPTree->Branch("gak8JetNoNuChargedEmEnergy", &gak8JetNoNuChargedEmEnergy, "gak8JetNoNuChargedEmEnergy[nGenak8JetNoNus]/F");
+ //ecalTPTree->Branch("gak8JetNoNuNeutralEmEnergy", &gak8JetNoNuNeutralEmEnergy, "gak8JetNoNuNeutralEmEnergy[nGenak8JetNoNus]/F");
+ ecalTPTree->Branch("gak8JetNoNuHadronEnergy", &gak8JetNoNuHadronEnergy, "gak8JetNoNuHadronEnergy[nGenak8JetNoNus]/F");
+ //ecalTPTree->Branch("gak8JetNoNuChargedHadronEnergy", &gak8JetNoNuChargedHadronEnergy, "gak8JetNoNuChargedHadronEnergy[nGenak8JetNoNus]/F");
+ //ecalTPTree->Branch("gak8JetNoNuNeutralHadronEnergy", &gak8JetNoNuNeutralHadronEnergy, "gak8JetNoNuNeutralHadronEnergy[nGenak8JetNoNus]/F");
+
+};
+
 
 // ------------ reset branches  ------------
 void phase2L1EcalTimingAnalyzer::resetBranches(){
   resetEventInfoBranches();
   resetEBCrystalBranches();
   resetGenParticleBranches();
-  resetGenJetBranches();
+  resetGenak4JetBranches();
+  resetGenak4JetNoNuBranches();
+  resetGenak8JetBranches();
+  resetGenak8JetNoNuBranches();
 };
 
 void phase2L1EcalTimingAnalyzer::resetEventInfoBranches(){
@@ -334,39 +463,143 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
 };
 
 
-void phase2L1EcalTimingAnalyzer::resetGenJetBranches(){
- //jet info
- nGenJets = 0;
+void phase2L1EcalTimingAnalyzer::resetGenak4JetBranches(){
+ // ak4 jet info
+ nGenak4Jets = 0;
 
  for(int i=0; i<GENJETARRAYSIZE; i++){
- gJetMass[i] = -666.;
- gJetE[i]    = -666.;
- gJetEt[i]   = -666.;
- gJetPt[i]   = -666.;
- gJetPx[i]   = -666.;
- gJetPy[i]   = -666.;
- gJetPz[i]   = -666.;
- gJetEta[i]  = -666.;
- gJetPhi[i]  = -666.;
+ gak4JetMass[i] = -666.;
+ gak4JetE[i]    = -666.;
+ gak4JetEt[i]   = -666.;
+ gak4JetPt[i]   = -666.;
+ gak4JetPx[i]   = -666.;
+ gak4JetPy[i]   = -666.;
+ gak4JetPz[i]   = -666.;
+ gak4JetEta[i]  = -666.;
+ gak4JetPhi[i]  = -666.;
 
- gJetArea[i] = -666.;
+ gak4JetArea[i] = -666.;
 
- gJetPileupE[i] = -666. ;
- gJetPileupIdFlag[i] = -666;
+ gak4JetPileupE[i] = -666. ;
+ gak4JetPileupIdFlag[i] = -666;
 
- gJetPassIdLoose[i] = false;
- gJetPassIdTight[i] = false;
+ gak4JetPassIdLoose[i] = false;
+ gak4JetPassIdTight[i] = false;
 
- gJetMuEnergy[i] = -666.;
- gJetEleFrac[i] = -666.;
- gJetEmEnergy[i] =-666.;
- gJetChargedEmEnergy[i] =-666.;
- gJetNeutralEmEnergy[i] = -666.;
- gJetHadronEnergy[i] = -666.;
- gJetChargedHadronEnergy[i] = -666.;
- gJetNeutralHadronEnergy[i] = -666.;
+ gak4JetMuEnergy[i] = -666.;
+ gak4JetEmEnergy[i] =-666.;
+ gak4JetChargedEmEnergy[i] =-666.;
+ gak4JetNeutralEmEnergy[i] = -666.;
+ gak4JetHadronEnergy[i] = -666.;
+ gak4JetChargedHadronEnergy[i] = -666.;
+ gak4JetNeutralHadronEnergy[i] = -666.;
  }
+
 };
+
+void phase2L1EcalTimingAnalyzer::resetGenak4JetNoNuBranches(){
+ // ak4 jet nonu info
+ nGenak4JetNoNus = 0;
+
+ for(int i=0; i<GENJETARRAYSIZE; i++){
+ gak4JetNoNuMass[i] = -666.;
+ gak4JetNoNuE[i]    = -666.;
+ gak4JetNoNuEt[i]   = -666.;
+ gak4JetNoNuPt[i]   = -666.;
+ gak4JetNoNuPx[i]   = -666.;
+ gak4JetNoNuPy[i]   = -666.;
+ gak4JetNoNuPz[i]   = -666.;
+ gak4JetNoNuEta[i]  = -666.;
+ gak4JetNoNuPhi[i]  = -666.;
+
+ gak4JetNoNuArea[i] = -666.;
+
+ gak4JetNoNuPileupE[i] = -666. ;
+ gak4JetNoNuPileupIdFlag[i] = -666;
+
+ gak4JetNoNuPassIdLoose[i] = false;
+ gak4JetNoNuPassIdTight[i] = false;
+
+ gak4JetNoNuMuEnergy[i] = -666.;
+ gak4JetNoNuEmEnergy[i] =-666.;
+ gak4JetNoNuChargedEmEnergy[i] =-666.;
+ gak4JetNoNuNeutralEmEnergy[i] = -666.;
+ gak4JetNoNuHadronEnergy[i] = -666.;
+ gak4JetNoNuChargedHadronEnergy[i] = -666.;
+ gak4JetNoNuNeutralHadronEnergy[i] = -666.;
+ }
+
+};
+
+void phase2L1EcalTimingAnalyzer::resetGenak8JetBranches(){
+ //ak8 jet info
+ nGenak8Jets = 0;
+
+ for(int i=0; i<GENJETARRAYSIZE; i++){
+ gak8JetMass[i] = -666.;
+ gak8JetE[i]    = -666.;
+ gak8JetEt[i]   = -666.;
+ gak8JetPt[i]   = -666.;
+ gak8JetPx[i]   = -666.;
+ gak8JetPy[i]   = -666.;
+ gak8JetPz[i]   = -666.;
+ gak8JetEta[i]  = -666.;
+ gak8JetPhi[i]  = -666.;
+
+ gak8JetArea[i] = -666.;
+
+ gak8JetPileupE[i] = -666. ;
+ gak8JetPileupIdFlag[i] = -666;
+
+ gak8JetPassIdLoose[i] = false;
+ gak8JetPassIdTight[i] = false;
+
+ gak8JetMuEnergy[i] = -666.;
+ gak8JetEmEnergy[i] =-666.;
+ gak8JetChargedEmEnergy[i] =-666.;
+ gak8JetNeutralEmEnergy[i] = -666.;
+ gak8JetHadronEnergy[i] = -666.;
+ gak8JetChargedHadronEnergy[i] = -666.;
+ gak8JetNeutralHadronEnergy[i] = -666.;
+ }
+
+};
+
+void phase2L1EcalTimingAnalyzer::resetGenak8JetNoNuBranches(){
+ //ak8 jet nonu info
+ nGenak8JetNoNus = 0;
+
+ for(int i=0; i<GENJETARRAYSIZE; i++){
+ gak8JetNoNuMass[i] = -666.;
+ gak8JetNoNuE[i]    = -666.;
+ gak8JetNoNuEt[i]   = -666.;
+ gak8JetNoNuPt[i]   = -666.;
+ gak8JetNoNuPx[i]   = -666.;
+ gak8JetNoNuPy[i]   = -666.;
+ gak8JetNoNuPz[i]   = -666.;
+ gak8JetNoNuEta[i]  = -666.;
+ gak8JetNoNuPhi[i]  = -666.;
+
+ gak8JetNoNuArea[i] = -666.;
+
+ gak8JetNoNuPileupE[i] = -666. ;
+ gak8JetNoNuPileupIdFlag[i] = -666;
+
+ gak8JetNoNuPassIdLoose[i] = false;
+ gak8JetNoNuPassIdTight[i] = false;
+
+ gak8JetNoNuMuEnergy[i] = -666.;
+ gak8JetNoNuEmEnergy[i] =-666.;
+ gak8JetNoNuChargedEmEnergy[i] =-666.;
+ gak8JetNoNuNeutralEmEnergy[i] = -666.;
+ gak8JetNoNuHadronEnergy[i] = -666.;
+ gak8JetNoNuChargedHadronEnergy[i] = -666.;
+ gak8JetNoNuNeutralHadronEnergy[i] = -666.;
+ }
+
+};
+
+
 // ------------corr eta phi  ------------
 vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen){
 	//X, Y, Z are for PV
@@ -871,7 +1104,7 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	  }
   }
 */
-
+/*
 
   //gen jet info
   //nGenJets = genJetHandle->size();
@@ -898,15 +1131,17 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
 	//gJetPassIdTight[nGenJets-1] = passJetID(&jet, 1);
 
 	gJetMuEnergy[nGenJets-1] = jet.muonEnergy();
-	//gJetEleFrac[nGenJets-1] = jet.electronEnergyFraction();
 	gJetEmEnergy[nGenJets-1] = jet.emEnergy();
-	gJetChargedEmEnergy[nGenJets-1] = jet.chargedEmEnergy();
-	gJetNeutralEmEnergy[nGenJets-1] = jet.neutralEmEnergy();
+	//gJetChargedEmEnergy[nGenJets-1] = jet.chargedEmEnergy();
+	//gJetNeutralEmEnergy[nGenJets-1] = jet.neutralEmEnergy();
 	gJetHadronEnergy[nGenJets-1] = jet.hadEnergy();
-	gJetChargedHadronEnergy[nGenJets-1] = jet.chargedHadronEnergy();
-	gJetNeutralHadronEnergy[nGenJets-1] = jet.neutralHadronEnergy();
-  }
+	//gJetChargedHadronEnergy[nGenJets-1] = jet.chargedHadronEnergy();
+	//gJetNeutralHadronEnergy[nGenJets-1] = jet.neutralHadronEnergy();
 
+	//std::cout<<" Gen Jet " << nGenJets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
+	//std::cout<<" Gen Jet " << nGenJets-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
+  }
+*/
 
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;

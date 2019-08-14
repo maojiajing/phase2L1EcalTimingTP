@@ -116,6 +116,9 @@ process.load("L1Trigger.phase2L1EcalTimingTP.phase2L1EcalTimingAnalyzer_cfi")
 
 process.L1EcalTimingAnalyzer = cms.EDAnalyzer('phase2L1EcalTimingAnalyzer',
                                        ak4GenJets = cms.InputTag("ak4GenJets", "", "HLT"),
+                                       ak4GenJetsNoNu = cms.InputTag("ak4GenJetsNoNu", "", "HLT"),
+                                       ak8GenJets = cms.InputTag("ak8GenJets", "", "HLT"),
+                                       ak8GenJetsNoNu = cms.InputTag("ak8GenJetsNoNu", "", "HLT"),
                                        genParticles = cms.InputTag("genParticles", "", "HLT"),
                                        genParticles_t0 = cms.InputTag("genParticles", "t0", "HLT"),
                                        ecalTPGsBarrel = cms.InputTag("simEcalEBTriggerPrimitiveDigis","","REPR"),
