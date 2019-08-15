@@ -130,6 +130,7 @@ void phase2L1EcalTimingAnalyzer::enableEBCrystalBranches(){
  ecalTPTree->Branch("eb_Et", &eb_Et, "eb_Et[nCrystals]/F");
  ecalTPTree->Branch("eb_Edep", &eb_Edep, "eb_Edep[nCrystals]/F");
  ecalTPTree->Branch("eb_time", &eb_time, "eb_time[nCrystals]/F");
+ ecalTPTree->Branch("eb_sigmat", &eb_sigmat, "eb_sigmat[nCrystals]/F");
  ecalTPTree->Branch("eb_id", &eb_id, "eb_id[nCrystals]/I");
  ecalTPTree->Branch("eb_ieta", &eb_ieta, "eb_ieta[nCrystals]/I");
  ecalTPTree->Branch("eb_iphi", &eb_iphi, "eb_iphi[nCrystals]/I");
@@ -173,6 +174,12 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gParticle_decay_vtx_y", &gParticle_decay_vtx_y, "gParticle_decay_vtx_y[nGenParticles]/F");
  ecalTPTree->Branch("gParticle_decay_vtx_z", &gParticle_decay_vtx_z, "gParticle_decay_vtx_z[nGenParticles]/F");
 
+ ecalTPTree->Branch("gParticle_prod_vtx_x", &gParticle_prod_vtx_x, "gParticle_prod_vtx_x[nGenParticles]/F");
+ ecalTPTree->Branch("gParticle_prod_vtx_y", &gParticle_prod_vtx_y, "gParticle_prod_vtx_y[nGenParticles]/F");
+ ecalTPTree->Branch("gParticle_prod_vtx_z", &gParticle_prod_vtx_z, "gParticle_prod_vtx_z[nGenParticles]/F");
+
+ ecalTPTree->Branch("g_eb_time_Emax_02", &g_eb_time_Emax_02, "g_eb_time_Emax_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_eb_sigmat_Emax_02", &g_eb_sigmat_Emax_02, "g_eb_sigmat_Emax_02[nGenParticles]/F");
  ecalTPTree->Branch("gEmax_02", &gEmax_02, "gEmax_02[nGenParticles]/F");
  ecalTPTree->Branch("gImax_02", &gImax_02, "gImax_02[nGenParticles]/I");
  ecalTPTree->Branch("gEsc_02", &gEsc_02, "gEsc_02[nGenParticles]/F");
@@ -181,6 +188,8 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gE5x5_02", &gE5x5_02, "gE5x5_02[nGenParticles]/F");
  ecalTPTree->Branch("gE3x3_02", &gE3x3_02, "gE3x3_02[nGenParticles]/F");
 
+ ecalTPTree->Branch("g_eb_time_Emax_01", &g_eb_time_Emax_01, "g_eb_time_Emax_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_eb_sigmat_Emax_01", &g_eb_sigmat_Emax_01, "g_eb_sigmat_Emax_01[nGenParticles]/F");
  ecalTPTree->Branch("gEmax_01", &gEmax_01, "gEmax_01[nGenParticles]/F");
  ecalTPTree->Branch("gImax_01", &gImax_01, "gImax_01[nGenParticles]/I");
  ecalTPTree->Branch("gEsc_01", &gEsc_01, "gEsc_01[nGenParticles]/F");
@@ -188,6 +197,15 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gE9x9_01", &gE9x9_01, "gE9x9_01[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_01", &gE5x5_01, "gE5x5_01[nGenParticles]/F");
  ecalTPTree->Branch("gE3x3_01", &gE3x3_01, "gE3x3_01[nGenParticles]/F");
+
+ ecalTPTree->Branch("gIcore", &gIcore, "gIcore[nGenParticles]/I");
+ ecalTPTree->Branch("g_eb_time", &g_eb_time, "g_eb_time[nGenParticles]/F");
+ ecalTPTree->Branch("g_eb_sigmat", &g_eb_sigmat, "g_eb_sigmat[nGenParticles]/F");
+ ecalTPTree->Branch("g_tof", &g_tof, "g_tof[nGenParticles]/F");
+ ecalTPTree->Branch("g_tvirtual", &g_tvirtual, "g_tvirtual[nGenParticles]/F");
+ ecalTPTree->Branch("gen_time", &gen_time, "gen_time[nGenParticles]/F");
+ ecalTPTree->Branch("gen_time_max_02", &gen_time_max_02, "gen_time_max_02[nGenParticles]/F");
+ ecalTPTree->Branch("gen_time_max_01", &gen_time_max_01, "gen_time_max_01[nGenParticles]/F");
 
  ecalTPTree->Branch("gParticleGrandMotherE", &gParticleGrandMotherE, "gParticleGrandMother[nGenParticles]/F");
  ecalTPTree->Branch("gParticleGrandMotherPt", &gParticleGrandMotherPt, "gParticleGrandMotherPt[nGenParticles]/F");
@@ -376,6 +394,7 @@ void phase2L1EcalTimingAnalyzer::resetEBCrystalBranches(){
  eb_Et[i]       = -666.;
  eb_Edep[i]     = -666.;
  eb_time[i]     = -666.;
+ eb_sigmat[i]     = -666.;
  eb_id[i]       = -666;
  eb_ieta[i]     = -666;
  eb_iphi[i]     = -666;
@@ -422,6 +441,12 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  gParticle_decay_vtx_y[i] = -666.;
  gParticle_decay_vtx_z[i] = -666.;
 
+ gParticle_prod_vtx_x[i] = -666.;
+ gParticle_prod_vtx_y[i] = -666.;
+ gParticle_prod_vtx_z[i] = -666.;
+
+ g_eb_time_Emax_02[i] = -666.;
+ g_eb_sigmat_Emax_02[i] = -666.;
  gEmax_02[i] = -666.;
  gImax_02[i] = -666;
  gEsc_02[i] = -666.;
@@ -430,6 +455,8 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  gE5x5_02[i] = -666.;
  gE3x3_02[i] = -666.;
 
+ g_eb_time_Emax_01[i] = -666.;
+ g_eb_sigmat_Emax_01[i] = -666.;
  gEmax_01[i] = -666.;
  gImax_01[i] = -666;
  gEsc_01[i] = -666.;
@@ -437,6 +464,15 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  gE9x9_01[i] = -666.;
  gE5x5_01[i] = -666.;
  gE3x3_01[i] = -666.;
+
+ gIcore[i] = -666;
+ g_eb_time[i] = -666.;
+ g_eb_sigmat[i] = -666.;
+ g_tof[i] = -666.;
+ g_tvirtual[i] = -666.;
+ gen_time[i] = -666.;
+ gen_time_max_02[i] = -666.;
+ gen_time_max_01[i] = -666.;
 
  gParticleGrandMotherE[i]            = -666.;
  gParticleGrandMotherPt[i]           = -666.;
@@ -673,7 +709,8 @@ bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent,
 	      std::default_random_engine generator;
               std::normal_distribution<float> distribution(0,sigma_t);
               eb_time[nCrystals-1] = distribution(generator);  // generates number
-	      //std::cout<<"dice " << eb_time[nCrystals-1] <<std::endl;
+              eb_sigmat[nCrystals-1] = sigma_t;  // generates number
+	      //stsigma_ttime[nCrystals-1] <<std::endl;
 	      //float sigma_t = TMath::pow(et,-0.34242268082)*0.121
 	//std::cout<<"time " << tpg.time()<<std::endl;
 	}
@@ -682,10 +719,19 @@ bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent,
 };
 
 bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
-  //fill gen info
-  
+
+//  std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
+//  phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches( genParticles);
+//  phase2L1EcalTimingAnalyzer::fillGenParticleMotherBranches( genParticles);
+//  phase2L1EcalTimingAnalyzer::fillGenParticleGrandMotherBranches( genParticles);
+//  //phase2L1EcalTimingAnalyzer::fillGenParticleSiblingBranches( genParticles);
+//  phase2L1EcalTimingAnalyzer::fillGenParticleTPBranches( genParticles);
+//  return true;
+//};
+//  //fill gen info
+//  
+//std::vector<reco::GenParticle>  phase2L1EcalTimingAnalyzer::GetGenParticles(){
   // Get genParticles
-  std::vector<reco::GenParticle> genPiZeros;
   std::vector<reco::GenParticle> genParticles;
   
 
@@ -740,7 +786,12 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
   genVertexT = *genVertexTHandle;
 
-  //std::cout<<"Finished  fill gen vtx"<<std::endl;
+//  return genParticles;
+//};
+//
+//
+//bool phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches(std::vector<reco::GenParticle> genParticles){
+//  //std::cout<<"Finished  fill gen vtx"<<std::endl;
 
   nGenParticles = genParticles.size();
   for(unsigned int i = 0; i< genParticles.size(); i++){
@@ -761,8 +812,18 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
     gParticle_decay_vtx_y[i] = gen.vy();
     gParticle_decay_vtx_z[i] = gen.vz();
 
-  //std::cout<<"Finished  fill  basic gen particles"<<std::endl;
-
+    gParticle_prod_vtx_x[i] = gen.vx();
+    gParticle_prod_vtx_y[i] = gen.vy();
+    gParticle_prod_vtx_z[i] = gen.vz();
+//   }
+//
+//   return true;
+//};
+//  //std::cout<<"Finished  fill  basic gen particles"<<std::endl;
+//
+//bool phase2L1EcalTimingAnalyzer::fillGenParticleMotherBranches(std::vector<reco::GenParticle> genParticles){
+//  for(unsigned int i = 0; i< genParticles.size(); i++){
+//    reco::GenParticle gen = genParticles[i];
     // gen mother
     if(gen.numberOfMothers() > 0){
 
@@ -820,16 +881,22 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
         			gParticleMotherEta[i] = mother.eta();
         			gParticleMotherPhi[i] = mother.phi();
         			gParticleMotherDR[i] = deltaR(mother.eta(), mother.phi(), genParticles[i].eta(), genParticles[i].phi());
+
 			}
 	
 			break;
 		}
 	}
      }// finish gen mother
-
-
-  //std::cout<<"Finished  fill gen particles mother"<<std::endl;
-
+//   }
+//   return true;
+//};
+//
+//  //std::cout<<"Finished  fill gen particles mother"<<std::endl;
+//
+//bool phase2L1EcalTimingAnalyzer::fillGenParticleGrandMotherBranches(std::vector<reco::GenParticle> genParticles){
+//  for(unsigned int i = 0; i< genParticles.size(); i++){
+//    reco::GenParticle gen = genParticles[i];
 	  int k1 = gParticleMotherIndex[i]; //mother index
 
 	  int k11 = gParticleMotherIndex[k1]; // grand mother index
@@ -851,11 +918,18 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
         	gParticleGrandMotherDR[i] = deltaR(grandmom.eta(), grandmom.phi(), genParticles[i].eta(), genParticles[i].phi());
 		
 	 }//finish grand mother
-
-
-  //std::cout<<"Finished  fill gen particles grand mother"<<std::endl;
-
+//   }
+//   return true;
+//};
+//
+//  //std::cout<<"Finished  fill gen particles grand mother"<<std::endl;
+//
+//bool phase2L1EcalTimingAnalyzer::fillGenParticleSiblingBranches(std::vector<reco::GenParticle> genParticles){
+//  for(unsigned int i = 0; i< genParticles.size(); i++){
+//    reco::GenParticle gen = genParticles[i];
+/*
 	  float mindr = 1000.;
+	  //int k1 = gParticleMotherIndex[i]; //mother index
 	  for(unsigned int p = 0; p < genParticles.size(); p++)
 	  {	
 	  	int k2 = gParticleMotherIndex[p];
@@ -872,75 +946,46 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 			gParticleSiblingId[i] = genParticles[p].pdgId();
 			gParticleSiblingIndex[i] = p;
 
-  		//std::cout<<"Finished  index1 "<<std::endl;
-			//sibling info
-			int si = gParticleSiblingIndex[i];
-			if(si!=-666){
-/*
-		    		reco::GenParticle sibling = genParticles[si];
-		
-		        	gParticleSiblingE[i] = sibling.energy();
-		        	gParticleSiblingPt[i] = sibling.pt();
-		        	gParticleSiblingPx[i] = sibling.px();
-		        	gParticleSiblingPy[i] = sibling.py();
-		        	gParticleSiblingPz[i] = sibling.pz();
-		        	gParticleSiblingEta[i] = sibling.eta();
-		        	gParticleSiblingPhi[i] = sibling.phi();
-        			gParticleSiblingDR[i] = deltaR(sibling.eta(), sibling.phi(), genParticles[i].eta(), genParticles[i].phi());
-*/
-		
-		        	gParticleSiblingE[i] = genParticles[si].energy();
-		        	gParticleSiblingPt[i] = genParticles[si].pt();
-		        	gParticleSiblingPx[i] = genParticles[si].px();
-		        	gParticleSiblingPy[i] = genParticles[si].py();
-		        	gParticleSiblingPz[i] = genParticles[si].pz();
-		        	gParticleSiblingEta[i] = genParticles[si].eta();
-		        	gParticleSiblingPhi[i] = genParticles[si].phi();
-        			gParticleSiblingDR[i] = deltaR(genParticles[si].eta(), genParticles[si].phi(), genParticles[i].eta(), genParticles[i].phi());
-			}
+		        gParticleSiblingE[i] = genParticles[p].energy();
+		        gParticleSiblingPt[i] = genParticles[p].pt();
+		        gParticleSiblingPx[i] = genParticles[p].px();
+		        gParticleSiblingPy[i] = genParticles[p].py();
+		        gParticleSiblingPz[i] = genParticles[p].pz();
+		        gParticleSiblingEta[i] = genParticles[p].eta();
+		        gParticleSiblingPhi[i] = genParticles[p].phi();
+        		gParticleSiblingDR[i] = deltaR(genParticles[p].eta(), genParticles[p].phi(), genParticles[i].eta(), genParticles[i].phi());
 
 			gParticleSiblingId[p] = genParticles[i].pdgId();
 			gParticleSiblingIndex[p] = i;
-
-  		//std::cout<<"Finished  index2 "<<std::endl;
-			//sibling info
-			int him = gParticleSiblingIndex[p];
-			if(him!=-666){
-/*
-		    		reco::GenParticle himself = genParticles[him];
 		
-		        	gParticleSiblingE[p] = himself.energy();
-		        	gParticleSiblingPt[p] = himself.pt();
-		        	gParticleSiblingPx[p] = himself.px();
-		        	gParticleSiblingPy[p] = himself.py();
-		        	gParticleSiblingPz[p] = himself.pz();
-		        	gParticleSiblingEta[p] = himself.eta();
-		        	gParticleSiblingPhi[p] = himself.phi();
-        			gParticleSiblingDR[p] = deltaR(himself.eta(), himself.phi(), genParticles[p].eta(), genParticles[p].phi());
-*/
-		
-		        	gParticleSiblingE[p] = genParticles[him].energy();
-		        	gParticleSiblingPt[p] = genParticles[him].pt();
-		        	gParticleSiblingPx[p] = genParticles[him].px();
-		        	gParticleSiblingPy[p] = genParticles[him].py();
-		        	gParticleSiblingPz[p] = genParticles[him].pz();
-		        	gParticleSiblingEta[p] = genParticles[him].eta();
-		        	gParticleSiblingPhi[p] = genParticles[him].phi();
-        			gParticleSiblingDR[p] = deltaR(genParticles[him].eta(), genParticles[him].phi(), genParticles[p].eta(), genParticles[p].phi());
-			}
+	        	gParticleSiblingE[p] = genParticles[i].energy();
+	        	gParticleSiblingPt[p] = genParticles[i].pt();
+	        	gParticleSiblingPx[p] = genParticles[i].px();
+	        	gParticleSiblingPy[p] = genParticles[i].py();
+	        	gParticleSiblingPz[p] = genParticles[i].pz();
+	        	gParticleSiblingEta[p] = genParticles[i].eta();
+	        	gParticleSiblingPhi[p] = genParticles[i].phi();
+        		gParticleSiblingDR[p] = deltaR(genParticles[i].eta(), genParticles[i].phi(), genParticles[p].eta(), genParticles[p].phi());
 
 			}//mindr
 			//if(gParticleId[i]==22) std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i]  << " test id " << genParticles[p].pdgId() <<std::endl;
 			//if(gParticleId[i]==22) std::cout<<" mother index " << gParticleMotherIndex[i] << " test mother index " << gParticleMotherIndex[p] << " test num dau " << genParticles[p].numberOfDaughters() <<std::endl;
-		}
+		}// p!=i k1=k2
 
 	  }//finish sibling
+*/
+//  }
+//  //std::cout<<"Finished  fill gen particles sibling"<<std::endl;
+//    
+//   return true;
+//};
+//
+//  //std::cout<<"Finished  fill gen particles grand mother"<<std::endl;
+//
+//bool phase2L1EcalTimingAnalyzer::fillGenParticleTPBranches(std::vector<reco::GenParticle> genParticles){
+//  for(unsigned int i = 0; i< genParticles.size(); i++){
+//    reco::GenParticle gen = genParticles[i];
 
-  //std::cout<<"Finished  fill gen particles sibling"<<std::endl;
-    //pi0 and Egammas in ecal barrel
-    //if( (abs(gen.pdgId())==111 || abs(gen.pdgId())==22 || abs(gen.pdgId())==11) && abs(gen.eta()) < 1.5 ){
-    //if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && gen.pt()>50 && abs(gen.eta()) < 1.5 ){
-    
     //gammas and pi0s in ecal barrel
     if(( (abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111) || abs(gen.pdgId())==111)  && abs(gen.eta()) < 1.5 ){
 	//conversion between ieta, iphi and detID
@@ -952,6 +997,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
 	float eta = etaphi[0];
 	float phi = etaphi[1];
+	float tof = etaphi[2];
+	float tvirtual = etaphi[3];
 
 	iEta = eta_to_iEta(eta);
 	iPhi = eta_to_iEta(phi);
@@ -990,10 +1037,16 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
 	//in cone 0.1/ 0.2 find crystal with Emax
 	float Edep = 0.;
+	float eb_time_Emax_02 = 0.;
+	float eb_sigmat_Emax_02 = 0.;
+	float eb_time_Emax_01 = 0.;
+	float eb_sigmat_Emax_01 = 0.;
 	float Emax_02 = 0.;
 	float Emax_01 = 0.;
 	int Imax_02 = -666; //crystal index
 	int Imax_01 = -666; //crystal index
+	int Icore = -666; //crystal index
+	float deltaR_eb = 1000.;
 
 	for(int k=0; k<nCrystals; k++){
 		//float eb_eta = iEta_to_eta(eb_ieta[k]);
@@ -1011,22 +1064,65 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 				//Edep_sc_02 += Edep;
 				Emax_02 = Edep;
 				Imax_02 = k;
+				eb_time_Emax_02 = eb_time[k];
+				eb_sigmat_Emax_02 = eb_sigmat[k];
 			}
 			if(deltaR_eb_gen < 0.1 ){
 				if(Edep >= Emax_01){
 					//Edep_sc_01 += Edep;
 					Emax_01 = Edep;
 					Imax_01 = k;
+					eb_time_Emax_01 = eb_time[k];
+					eb_sigmat_Emax_01 = eb_sigmat[k];
+				}
+				if(deltaR_eb_gen <= deltaR_eb){
+					deltaR_eb = deltaR_eb_gen;
+					Icore = k;
 				}
 			}
 		}
 	}//loop of crystals
 
+	g_eb_time_Emax_02[i] = eb_time_Emax_02;
+	g_eb_sigmat_Emax_02[i] = eb_sigmat_Emax_02;
 	gEmax_02[i] = Emax_02;
 	gImax_02[i] = Imax_02;
 
+	g_eb_time_Emax_01[i] = eb_time_Emax_01;
+	g_eb_sigmat_Emax_01[i] = eb_sigmat_Emax_01;
 	gEmax_01[i] = Emax_01;
 	gImax_01[i] = Imax_01;
+
+	gIcore[i] = Icore;
+
+	if(eb_time[Icore]>0){
+	g_eb_time[i] = eb_time[Icore];
+	}else{
+	g_eb_time[i] = 0.;
+	}
+
+	if(eb_time[Imax_01]>0){
+	g_eb_time_Emax_01[i] = eb_time[Imax_01];
+	}else{
+	g_eb_time_Emax_01[i] = 0.;
+	}
+
+	if(eb_time[Imax_02]>0){
+	g_eb_time_Emax_02[i] = eb_time[Imax_02];
+	}else{
+	g_eb_time_Emax_02[i] = 0.;
+	}
+
+	//t = tof + eb_t + t_bs - tvirtual
+	float mimic_gen_time = tof + g_eb_time[i] + genVertexT -tvirtual;
+	float mimic_gen_time_max_02 = tof + g_eb_time_Emax_02[i] + genVertexT -tvirtual;
+	float mimic_gen_time_max_01 = tof + g_eb_time_Emax_01[i] + genVertexT -tvirtual;
+        
+	g_tof[i] = tof;
+	g_tvirtual[i] = tvirtual;
+	gen_time[i] = mimic_gen_time;
+	gen_time_max_02[i] = mimic_gen_time_max_02;
+	gen_time_max_01[i] = mimic_gen_time_max_01;
 
   //std::cout<<"Finished  fill gen Emax and Imax"<<std::endl;
 
@@ -1305,6 +1401,8 @@ vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float
 	y_ecal = Y + 30.*(Py/E)*t_ecal;
 	z_ecal = Z + 30.*(Pz/E)*t_ecal;
 
+	float t_virtual = (1/30.)*sqrt(pow(radius_ecal,2)+pow(z_ecal,2));
+
 	//corrections of phi and eta wrt origin
 	float phi = atan((y_ecal-0.)/(x_ecal-X-0.));
 	if(x_ecal < 0.0) phi = TMath::Pi() + phi;
@@ -1317,6 +1415,8 @@ vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float
 	vector<float> etaphi;
 	etaphi.push_back(eta);
 	etaphi.push_back(phi);
+	etaphi.push_back(t_ecal);
+	etaphi.push_back(t_virtual);
 	return etaphi; 
 };
 

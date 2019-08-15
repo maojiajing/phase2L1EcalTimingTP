@@ -150,7 +150,15 @@ public:
 // ------------ fill branches  ------------
   bool fillEventInfoBranches(const edm::Event& iEvent);
   bool fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+
   bool fillGenParticleBranches();
+  //std::vector<reco::GenParticle> GetGenParticles();
+  //bool fillGenParticleBasicBranches(std::vector<reco::GenParticle> genParticles);
+  //bool fillGenParticleMotherBranches(std::vector<reco::GenParticle> genParticles);
+  //bool fillGenParticleGrandMotherBranches(std::vector<reco::GenParticle> genParticles);
+  //bool fillGenParticleSiblingBranches(std::vector<reco::GenParticle> genParticles);
+  //bool fillGenParticleTPBranches(std::vector<reco::GenParticle> genParticles);
+
   bool fillGenak4JetBranches();
   bool fillGenak4JetNoNuBranches();
   bool fillGenak8JetBranches();
@@ -207,6 +215,7 @@ private:
  float eb_Et[EBCRYSTALARRAYSIZE];
  float eb_Edep[EBCRYSTALARRAYSIZE];
  float eb_time[EBCRYSTALARRAYSIZE];
+ float eb_sigmat[EBCRYSTALARRAYSIZE];
  int eb_id[EBCRYSTALARRAYSIZE];
  int eb_ieta[EBCRYSTALARRAYSIZE];
  int eb_iphi[EBCRYSTALARRAYSIZE];
@@ -363,6 +372,12 @@ private:
  float gParticle_decay_vtx_y[GENPARTICLEARRAYSIZE];
  float gParticle_decay_vtx_z[GENPARTICLEARRAYSIZE];
 
+ float gParticle_prod_vtx_x[GENPARTICLEARRAYSIZE];
+ float gParticle_prod_vtx_y[GENPARTICLEARRAYSIZE];
+ float gParticle_prod_vtx_z[GENPARTICLEARRAYSIZE];
+
+ float g_eb_time_Emax_02[GENPARTICLEARRAYSIZE];
+ float g_eb_sigmat_Emax_02[GENPARTICLEARRAYSIZE];
  float gEmax_02[GENPARTICLEARRAYSIZE];
  int gImax_02[GENPARTICLEARRAYSIZE];
  float gEsc_02[GENPARTICLEARRAYSIZE];
@@ -371,6 +386,8 @@ private:
  float gE5x5_02[GENPARTICLEARRAYSIZE];
  float gE3x3_02[GENPARTICLEARRAYSIZE];
 
+ float g_eb_time_Emax_01[GENPARTICLEARRAYSIZE];
+ float g_eb_sigmat_Emax_01[GENPARTICLEARRAYSIZE];
  float gEmax_01[GENPARTICLEARRAYSIZE];
  int gImax_01[GENPARTICLEARRAYSIZE];
  float gEsc_01[GENPARTICLEARRAYSIZE];
@@ -378,6 +395,15 @@ private:
  float gE9x9_01[GENPARTICLEARRAYSIZE];
  float gE5x5_01[GENPARTICLEARRAYSIZE];
  float gE3x3_01[GENPARTICLEARRAYSIZE];
+
+ int gIcore[GENPARTICLEARRAYSIZE];
+ float g_eb_time[GENPARTICLEARRAYSIZE];
+ float g_eb_sigmat[GENPARTICLEARRAYSIZE];
+ float g_tof[GENPARTICLEARRAYSIZE];
+ float g_tvirtual[GENPARTICLEARRAYSIZE];
+ float gen_time[GENPARTICLEARRAYSIZE];
+ float gen_time_max_02[GENPARTICLEARRAYSIZE];
+ float gen_time_max_01[GENPARTICLEARRAYSIZE];
 
  float gParticleGrandMotherE[GENPARTICLEARRAYSIZE];
  float gParticleGrandMotherPt[GENPARTICLEARRAYSIZE];
