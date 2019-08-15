@@ -175,12 +175,16 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
 
  ecalTPTree->Branch("gEmax_02", &gEmax_02, "gEmax_02[nGenParticles]/F");
  ecalTPTree->Branch("gImax_02", &gImax_02, "gImax_02[nGenParticles]/I");
+ ecalTPTree->Branch("gEsc_02", &gEsc_02, "gEsc_02[nGenParticles]/F");
+ ecalTPTree->Branch("genEsc_02", &genEsc_02, "genEsc_02[nGenParticles]/F");
  ecalTPTree->Branch("gE9x9_02", &gE9x9_02, "gE9x9_02[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_02", &gE5x5_02, "gE5x5_02[nGenParticles]/F");
  ecalTPTree->Branch("gE3x3_02", &gE3x3_02, "gE3x3_02[nGenParticles]/F");
 
  ecalTPTree->Branch("gEmax_01", &gEmax_01, "gEmax_01[nGenParticles]/F");
  ecalTPTree->Branch("gImax_01", &gImax_01, "gImax_01[nGenParticles]/I");
+ ecalTPTree->Branch("gEsc_01", &gEsc_01, "gEsc_01[nGenParticles]/F");
+ ecalTPTree->Branch("genEsc_01", &genEsc_01, "genEsc_01[nGenParticles]/F");
  ecalTPTree->Branch("gE9x9_01", &gE9x9_01, "gE9x9_01[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_01", &gE5x5_01, "gE5x5_01[nGenParticles]/F");
  ecalTPTree->Branch("gE3x3_01", &gE3x3_01, "gE3x3_01[nGenParticles]/F");
@@ -420,12 +424,16 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
 
  gEmax_02[i] = -666.;
  gImax_02[i] = -666;
+ gEsc_02[i] = -666.;
+ genEsc_02[i] = -666.;
  gE9x9_02[i] = -666.;
  gE5x5_02[i] = -666.;
  gE3x3_02[i] = -666.;
 
  gEmax_01[i] = -666.;
  gImax_01[i] = -666;
+ gEsc_01[i] = -666.;
+ genEsc_01[i] = -666.;
  gE9x9_01[i] = -666.;
  gE5x5_01[i] = -666.;
  gE3x3_01[i] = -666.;
@@ -707,6 +715,7 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 */
     }
     //genParticles.push_back(*ptr);
+  //std::cout<<"Finished push back gen particles"<<std::endl;
 
     int num = ptr->numberOfDaughters();
     if (!foundGenVertex)
@@ -731,6 +740,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
   genVertexT = *genVertexTHandle;
 
+  //std::cout<<"Finished  fill gen vtx"<<std::endl;
+
   nGenParticles = genParticles.size();
   for(unsigned int i = 0; i< genParticles.size(); i++){
     reco::GenParticle gen = genParticles[i];
@@ -750,27 +761,29 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
     gParticle_decay_vtx_y[i] = gen.vy();
     gParticle_decay_vtx_z[i] = gen.vz();
 
+  //std::cout<<"Finished  fill  basic gen particles"<<std::endl;
+
     // gen mother
     if(gen.numberOfMothers() > 0){
-/*
-	const reco::Candidate* mother = gen.mother(0);
-	//const reco::Candidate mother = *mo;
 
-        			gParticleMotherId[i] = mother->pdgId();
-	for(unsigned int j = 0; j < genParticles.size(); j++)
-	{
-		if(genParticles[j].pdgId() == mother->pdgId() && genParticles[j].energy() == mother->energy() && genParticles[j].eta() ==mother->eta() && genParticles[j].phi() == mother->phi() && genParticles[j].pt() == mother->pt() && genParticles[j].px() == mother->px() )
-			gParticleMotherIndex[i] = j;
-        }
-        			gParticleMotherE[i] = mother->energy();
-        			gParticleMotherPt[i] = mother->pt();
-        			gParticleMotherPx[i] = mother->px();
-        			gParticleMotherPy[i] = mother->py();
-        			gParticleMotherPz[i] = mother->pz();
-        			gParticleMotherEta[i] = mother->eta();
-        			gParticleMotherPhi[i] = mother->phi();
-        			gParticleMotherDR[i] = deltaR(mother->eta(), mother->phi(), genParticles[i].eta(), genParticles[i].phi());
-*/
+//	const reco::Candidate* mother = gen.mother(0);
+//	//const reco::Candidate mother = *mo;
+//
+//        			gParticleMotherId[i] = mother->pdgId();
+//	for(unsigned int j = 0; j < genParticles.size(); j++)
+//	{
+//		if(genParticles[j].pdgId() == mother->pdgId() && genParticles[j].energy() == mother->energy() && genParticles[j].eta() ==mother->eta() && genParticles[j].phi() == mother->phi() && genParticles[j].pt() == mother->pt() && genParticles[j].px() == mother->px() )
+//			gParticleMotherIndex[i] = j;
+//        }
+//        			gParticleMotherE[i] = mother->energy();
+//        			gParticleMotherPt[i] = mother->pt();
+//        			gParticleMotherPx[i] = mother->px();
+//        			gParticleMotherPy[i] = mother->py();
+//        			gParticleMotherPz[i] = mother->pz();
+//        			gParticleMotherEta[i] = mother->eta();
+//        			gParticleMotherPhi[i] = mother->phi();
+//        			gParticleMotherDR[i] = deltaR(mother->eta(), mother->phi(), genParticles[i].eta(), genParticles[i].phi());
+
 //careful version
 	const reco::Candidate *firstMotherWithDifferentID = findFirstMotherWithDifferentID(&gen);
         if (firstMotherWithDifferentID)
@@ -814,6 +827,9 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	}
      }// finish gen mother
 
+
+  //std::cout<<"Finished  fill gen particles mother"<<std::endl;
+
 	  int k1 = gParticleMotherIndex[i]; //mother index
 
 	  int k11 = gParticleMotherIndex[k1]; // grand mother index
@@ -836,23 +852,31 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		
 	 }//finish grand mother
 
+
+  //std::cout<<"Finished  fill gen particles grand mother"<<std::endl;
+
 	  float mindr = 1000.;
 	  for(unsigned int p = 0; p < genParticles.size(); p++)
 	  {	
 	  	int k2 = gParticleMotherIndex[p];
 
 		float dr = deltaR(gParticleEta[i], gParticlePhi[i], gParticleEta[p], gParticlePhi[p]);
+  		//std::cout<<"Finished  dr"<<std::endl;
 		if(p!=i && k1==k2){
+  		//std::cout<<"Finished  if id"<<std::endl;
 			if(dr <= mindr){
+  		//std::cout<<"Finished  if dr"<<std::endl;
 			
 			mindr = dr;
 
 			gParticleSiblingId[i] = genParticles[p].pdgId();
 			gParticleSiblingIndex[i] = p;
 
+  		//std::cout<<"Finished  index1 "<<std::endl;
 			//sibling info
 			int si = gParticleSiblingIndex[i];
 			if(si!=-666){
+/*
 		    		reco::GenParticle sibling = genParticles[si];
 		
 		        	gParticleSiblingE[i] = sibling.energy();
@@ -863,14 +887,26 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		        	gParticleSiblingEta[i] = sibling.eta();
 		        	gParticleSiblingPhi[i] = sibling.phi();
         			gParticleSiblingDR[i] = deltaR(sibling.eta(), sibling.phi(), genParticles[i].eta(), genParticles[i].phi());
+*/
+		
+		        	gParticleSiblingE[i] = genParticles[si].energy();
+		        	gParticleSiblingPt[i] = genParticles[si].pt();
+		        	gParticleSiblingPx[i] = genParticles[si].px();
+		        	gParticleSiblingPy[i] = genParticles[si].py();
+		        	gParticleSiblingPz[i] = genParticles[si].pz();
+		        	gParticleSiblingEta[i] = genParticles[si].eta();
+		        	gParticleSiblingPhi[i] = genParticles[si].phi();
+        			gParticleSiblingDR[i] = deltaR(genParticles[si].eta(), genParticles[si].phi(), genParticles[i].eta(), genParticles[i].phi());
 			}
 
 			gParticleSiblingId[p] = genParticles[i].pdgId();
 			gParticleSiblingIndex[p] = i;
 
+  		//std::cout<<"Finished  index2 "<<std::endl;
 			//sibling info
 			int him = gParticleSiblingIndex[p];
 			if(him!=-666){
+/*
 		    		reco::GenParticle himself = genParticles[him];
 		
 		        	gParticleSiblingE[p] = himself.energy();
@@ -881,16 +917,30 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		        	gParticleSiblingEta[p] = himself.eta();
 		        	gParticleSiblingPhi[p] = himself.phi();
         			gParticleSiblingDR[p] = deltaR(himself.eta(), himself.phi(), genParticles[p].eta(), genParticles[p].phi());
+*/
+		
+		        	gParticleSiblingE[p] = genParticles[him].energy();
+		        	gParticleSiblingPt[p] = genParticles[him].pt();
+		        	gParticleSiblingPx[p] = genParticles[him].px();
+		        	gParticleSiblingPy[p] = genParticles[him].py();
+		        	gParticleSiblingPz[p] = genParticles[him].pz();
+		        	gParticleSiblingEta[p] = genParticles[him].eta();
+		        	gParticleSiblingPhi[p] = genParticles[him].phi();
+        			gParticleSiblingDR[p] = deltaR(genParticles[him].eta(), genParticles[him].phi(), genParticles[p].eta(), genParticles[p].phi());
 			}
+
 			}//mindr
 			//if(gParticleId[i]==22) std::cout<<" Particle GEN Id " << gen.pdgId() << " MotherId " << gParticleMotherId[i]  << " test id " << genParticles[p].pdgId() <<std::endl;
 			//if(gParticleId[i]==22) std::cout<<" mother index " << gParticleMotherIndex[i] << " test mother index " << gParticleMotherIndex[p] << " test num dau " << genParticles[p].numberOfDaughters() <<std::endl;
 		}
+
 	  }//finish sibling
+
+  //std::cout<<"Finished  fill gen particles sibling"<<std::endl;
     //pi0 and Egammas in ecal barrel
     //if( (abs(gen.pdgId())==111 || abs(gen.pdgId())==22 || abs(gen.pdgId())==11) && abs(gen.eta()) < 1.5 ){
     //if(abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111  && gen.pt()>50 && abs(gen.eta()) < 1.5 ){
-    //
+    
     //gammas and pi0s in ecal barrel
     if(( (abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111) || abs(gen.pdgId())==111)  && abs(gen.eta()) < 1.5 ){
 	//conversion between ieta, iphi and detID
@@ -910,18 +960,47 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
 	//std::cout<<" Particle GEN Eta " << gen.eta() << " Phi " << gen.phi() << " ieta " << gen.eta()/unit << " iphi " << gen.phi()/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
 	//std::cout<<" Particle CORR Eta " << eta << " Phi " << phi << " ieta " << eta/unit << " iphi " << phi/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
+	
+	//super cluster gen energy
+	float Egen_sc_02 = gen.energy();
+	float Egen_sc_01 = gen.energy();
 
+	for(unsigned int q = 0; q < genParticles.size(); q++)
+	{
+    		reco::GenParticle neighbor = genParticles[q];
+        	float distance = deltaR(gen.eta(), gen.phi(), genParticles[q].eta(), genParticles[q].phi());
+
+		if(gen.pdgId()==neighbor.pdgId() && distance<0.2)
+		{
+			Egen_sc_02 += neighbor.energy();
+
+			if(distance<0.1)
+			{
+				Egen_sc_01 += neighbor.energy();
+			}//dr 0.1
+
+		}//dr 0.2
+
+	}
+
+	genEsc_02[i] = Egen_sc_02;
+	genEsc_01[i] = Egen_sc_01;
+
+	//std::cout<<"Finished  fill gen particles Egen SC"<<std::endl;
+
+	//in cone 0.1/ 0.2 find crystal with Emax
 	float Edep = 0.;
 	float Emax_02 = 0.;
 	float Emax_01 = 0.;
 	int Imax_02 = -666; //crystal index
 	int Imax_01 = -666; //crystal index
+
 	for(int k=0; k<nCrystals; k++){
 		//float eb_eta = iEta_to_eta(eb_ieta[k]);
 		//float eb_phi = iEta_to_eta(eb_iphi[k]);
 		float eb_eta = eb_cell_Eta[k];
 		float eb_phi = eb_cell_Phi[k];
-		float deltaR_eb_gen = deltaR(eb_eta, eb_phi, eta, phi);
+		float deltaR_eb_gen = deltaR(eb_eta, eb_phi, eta, phi); // eta, phi are corrected eta, phi wrt origin
 		//if(eb_Et[k]!=-666 ) Edep = Et_to_E(eb_Et[k], eb_ieta[k]);
 		if(eb_Et[k]!=-666 ) Edep = eb_Edep[k];
 		else Edep = 0.;
@@ -929,11 +1008,13 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		//find highest energy deposit within cone 0.2 or 0.1
 		if(deltaR_eb_gen < 0.2 ){
 			if(Edep >= Emax_02){
+				//Edep_sc_02 += Edep;
 				Emax_02 = Edep;
 				Imax_02 = k;
 			}
 			if(deltaR_eb_gen < 0.1 ){
 				if(Edep >= Emax_01){
+					//Edep_sc_01 += Edep;
 					Emax_01 = Edep;
 					Imax_01 = k;
 				}
@@ -947,11 +1028,19 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	gEmax_01[i] = Emax_01;
 	gImax_01[i] = Imax_01;
 
+  //std::cout<<"Finished  fill gen Emax and Imax"<<std::endl;
+
 	int seed_ieta_02 = eb_ieta[Imax_02];
 	int seed_iphi_02 = eb_iphi[Imax_02];
 
 	int seed_ieta_01 = eb_ieta[Imax_01];
 	int seed_iphi_01 = eb_iphi[Imax_01];
+
+	float seed_eta_02 = eb_cell_Eta[Imax_02];
+	float seed_phi_02 = eb_cell_Phi[Imax_02];
+
+	float seed_eta_01 = eb_cell_Eta[Imax_01];
+	float seed_phi_01 = eb_cell_Phi[Imax_01];
 
 	float Edep9x9_02 = 0.;
 	float Edep5x5_02 = 0.;
@@ -961,6 +1050,10 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	float Edep5x5_01 = 0.;
 	float Edep3x3_01 = 0.;
 
+	//super cluster Edep
+	float Edep_sc_02 = 0.;
+	float Edep_sc_01 = 0.;
+	
 	for(int k=0; k<nCrystals; k++){
 		int ieta = eb_ieta[k];
 		int iphi = eb_iphi[k];
@@ -984,6 +1077,20 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 				}
 			}
 		}//cone 0.1
+
+		float eb_eta = eb_cell_Eta[k];
+		float eb_phi = eb_cell_Phi[k];
+
+		float deltaR_eb_emax_02 = deltaR(eb_eta, eb_phi, seed_eta_02, seed_phi_02); 
+		if( eb_Edep[k]!=-666 && deltaR_eb_emax_02<0.2){
+			Edep_sc_02 += eb_Edep[k];
+		}//cone 0.2
+
+		float deltaR_eb_emax_01 = deltaR(eb_eta, eb_phi, seed_eta_01, seed_phi_01); 
+		if( eb_Edep[k]!=-666 && deltaR_eb_emax_01<0.1){
+			Edep_sc_01 += eb_Edep[k];
+		}//cone 0.2
+
 	}//loop of crystals
 
 	gE9x9_02[i] = Edep9x9_02;
@@ -994,10 +1101,20 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	gE5x5_01[i] = Edep5x5_02;
 	gE3x3_01[i] = Edep3x3_02;
 
-	//std::cout<<"Eta " << gen.eta() << " Phi " << gen.phi() <<  " iEta " << iEta << " iPhi " << iPhi << " E " << gen.energy()  << " Pt " << gen.pt() << " Edep 9x9 " << Edep9x9 << " Edep 5x5 " << Edep5x5 << " Edep3x3 " << Edep3x3  <<std::endl;
+	gEsc_02[i] = Edep_sc_02;
+	gEsc_01[i] = Edep_sc_01;
+
+  //std::cout<<"Finished  fill gen particles clusters"<<std::endl;
+	//std::cout<<"Eta " << gen.eta() << " Phi " << gen.phi() <<  " iEta " << iEta << " iPhi " << iPhi << " E " << gen.energy()  << " Pt " << gen.pt() << " Edep 9x9 " << Edep9x9_01 << " Edep 5x5 " << Edep5x5_01 << " Edep3x3 " << Edep3x3_01  <<std::endl;
+	//std::cout<<" Edep SC 0.1 " << Edep_sc_01  <<std::endl;
+	//if(Edep_sc_01-Edep3x3_01>0)  std::cout<<" true ?" << Edep_sc_01-Edep3x3_01  <<std::endl;
+	//else  std::cout<<" false ?" << Edep_sc_01-Edep3x3_01  <<std::endl;
+	
+
     }//photons and pi0s 
 
   }//loop of gen
+
 
   return true;
 };
@@ -1224,15 +1341,18 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   //fill branches
   // fill event info
   fillEventInfoBranches(iEvent);
+  std::cout<<"Finished  fill event info"<<std::endl;
   //ecal barrel crystals
   fillEBCrystalBranches(iEvent, iSetup);
+  std::cout<<"Finished  fill ecal barrel crystals"<<std::endl;
   //fill gen info
   fillGenParticleBranches();
+  std::cout<<"Finished  fill gen particles"<<std::endl;
   //fill jet info
-  fillGenak4JetBranches();
-  fillGenak4JetNoNuBranches();
-  fillGenak8JetBranches();
-  fillGenak8JetNoNuBranches();
+  //fillGenak4JetBranches();
+  //fillGenak4JetNoNuBranches();
+  //fillGenak8JetBranches();
+  //fillGenak8JetNoNuBranches();
 
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;
