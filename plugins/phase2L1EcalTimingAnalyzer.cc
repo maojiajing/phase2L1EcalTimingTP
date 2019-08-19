@@ -183,6 +183,10 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gEmax_02", &gEmax_02, "gEmax_02[nGenParticles]/F");
  ecalTPTree->Branch("gImax_02", &gImax_02, "gImax_02[nGenParticles]/I");
  ecalTPTree->Branch("gEsc_02", &gEsc_02, "gEsc_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sc_02", &g_dt_sc_02, "g_dt_sc_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sc_02", &g_cnt_sc_02, "g_cnt_sc_02[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmax_sc_02", &g_tmax_sc_02, "g_tmax_sc_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmin_sc_02", &g_tmin_sc_02, "g_tmin_sc_02[nGenParticles]/F");
  ecalTPTree->Branch("genEsc_02", &genEsc_02, "genEsc_02[nGenParticles]/F");
  ecalTPTree->Branch("gE9x9_02", &gE9x9_02, "gE9x9_02[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_02", &gE5x5_02, "gE5x5_02[nGenParticles]/F");
@@ -193,6 +197,10 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gEmax_01", &gEmax_01, "gEmax_01[nGenParticles]/F");
  ecalTPTree->Branch("gImax_01", &gImax_01, "gImax_01[nGenParticles]/I");
  ecalTPTree->Branch("gEsc_01", &gEsc_01, "gEsc_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sc_01", &g_dt_sc_01, "g_dt_sc_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmax_sc_01", &g_tmax_sc_01, "g_tmax_sc_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sc_01", &g_cnt_sc_01, "g_cnt_sc_01[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmin_sc_01", &g_tmin_sc_01, "g_tmin_sc_01[nGenParticles]/F");
  ecalTPTree->Branch("genEsc_01", &genEsc_01, "genEsc_01[nGenParticles]/F");
  ecalTPTree->Branch("gE9x9_01", &gE9x9_01, "gE9x9_01[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_01", &gE5x5_01, "gE5x5_01[nGenParticles]/F");
@@ -449,6 +457,10 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  g_eb_sigmat_Emax_02[i] = -666.;
  gEmax_02[i] = -666.;
  gImax_02[i] = -666;
+ g_dt_sc_02[i] = -666.;
+ g_tmax_sc_02[i] = -666.;
+ g_cnt_sc_02[i] = -666;
+ g_tmin_sc_02[i] = -666.;
  gEsc_02[i] = -666.;
  genEsc_02[i] = -666.;
  gE9x9_02[i] = -666.;
@@ -459,6 +471,10 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  g_eb_sigmat_Emax_01[i] = -666.;
  gEmax_01[i] = -666.;
  gImax_01[i] = -666;
+ g_dt_sc_01[i] = -666.;
+ g_tmax_sc_01[i] = -666.;
+ g_cnt_sc_01[i] = -666;
+ g_tmin_sc_01[i] = -666.;
  gEsc_01[i] = -666.;
  genEsc_01[i] = -666.;
  gE9x9_01[i] = -666.;
@@ -985,6 +1001,21 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 //bool phase2L1EcalTimingAnalyzer::fillGenParticleTPBranches(std::vector<reco::GenParticle> genParticles){
 //  for(unsigned int i = 0; i< genParticles.size(); i++){
 //    reco::GenParticle gen = genParticles[i];
+//
+	//corr eta phi to origin
+	vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
+	float eta = etaphi[0];
+	float phi = etaphi[1];
+	float tof = etaphi[2];
+	float tvirtual = etaphi[3];
+
+	g_tof[i] = tof;
+	g_tvirtual[i] = tvirtual;
+
+  }//loop of gen
+
+  for(unsigned int i = 0; i< genParticles.size(); i++){
+    reco::GenParticle gen = genParticles[i];
 
     //gammas and pi0s in ecal barrel
     if(( (abs(gen.pdgId())==22 && abs(gParticleMotherId[i])==111) || abs(gen.pdgId())==111)  && abs(gen.eta()) < 1.5 ){
@@ -1000,6 +1031,9 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	float tof = etaphi[2];
 	float tvirtual = etaphi[3];
 
+	g_tof[i] = tof;
+	g_tvirtual[i] = tvirtual;
+
 	iEta = eta_to_iEta(eta);
 	iPhi = eta_to_iEta(phi);
 
@@ -1009,26 +1043,74 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	//std::cout<<" Particle CORR Eta " << eta << " Phi " << phi << " ieta " << eta/unit << " iphi " << phi/unit << " iEta " << iEta << " iPhi " << iPhi << " id " << id <<std::endl;
 	
 	//super cluster gen energy
+	int cnt_sc_02 = 0;
+	int cnt_sc_01 = 0;
+	float max_sc_02 = 0.;
+	float min_sc_02 = 666.;
+	float max_sc_01 = 0.;
+	float min_sc_01 = 666.;
+	float t1 = 0.;
+	float t2 = 0.;
 	float Egen_sc_02 = gen.energy();
 	float Egen_sc_01 = gen.energy();
 
 	for(unsigned int q = 0; q < genParticles.size(); q++)
 	{
     		reco::GenParticle neighbor = genParticles[q];
+		if( abs(neighbor.eta()) >= 1.5) continue;
         	float distance = deltaR(gen.eta(), gen.phi(), genParticles[q].eta(), genParticles[q].phi());
 
 		if(gen.pdgId()==neighbor.pdgId() && distance<0.2)
 		{
 			Egen_sc_02 += neighbor.energy();
 
+			if(g_tof[q] == -666) t2 = 0.;	
+			else t2 = g_tof[q];	
+
+			if(t2 >= max_sc_02)
+				max_sc_02 = t2;
+			if(t2 <= min_sc_02 && t2>0)
+				min_sc_02 = t2;
+
+			cnt_sc_02++;
+
+
 			if(distance<0.1)
 			{
 				Egen_sc_01 += neighbor.energy();
+
+				if(g_tof[q] == -666) t1 = 0.;	
+				else t1 = g_tof[q];	
+
+				if(t1 >= max_sc_01)
+					max_sc_01 = t1;
+				if(t1 <= min_sc_01 && t2>0)
+					min_sc_01 = t1;
+
+	//if(t1>0 && g_tof[q]>0 && tof>0 && max_sc_01>0 && min_sc_01>0) std::cout<<"index " <<i << " dr 0.1 " << t1 << " " << g_tof[q] <<" "  << g_tof[i] <<" " << " max " << max_sc_01 <<  " min " << min_sc_01 <<std::endl;
+	std::cout<<"index " <<i << " dr 0.1, index q: "<< q << " t1:  " << t1 << " t1 origin (include -666) :  " << g_tof[q] <<" compare to core: "  << g_tof[i] <<" result " << " max: " << max_sc_01 <<  " min: " << min_sc_01 <<std::endl;
+
+				cnt_sc_01++;
+
 			}//dr 0.1
 
 		}//dr 0.2
 
 	}
+
+	if(min_sc_02==666) min_sc_02 =0.;
+	if(min_sc_01==666) min_sc_01 =0.;
+
+	g_cnt_sc_02[i] = cnt_sc_02;
+	g_cnt_sc_01[i] = cnt_sc_01;
+
+	g_tmax_sc_02[i] = max_sc_02;
+	g_tmax_sc_01[i] = max_sc_01;
+	g_tmin_sc_02[i] = min_sc_02;
+	g_tmin_sc_01[i] = min_sc_01;
+
+	g_dt_sc_02[i] = max_sc_02 - min_sc_02;
+	g_dt_sc_01[i] = max_sc_01 - min_sc_01;
 
 	genEsc_02[i] = Egen_sc_02;
 	genEsc_01[i] = Egen_sc_01;
@@ -1118,8 +1200,6 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	float mimic_gen_time_max_02 = tof + g_eb_time_Emax_02[i] + genVertexT -tvirtual;
 	float mimic_gen_time_max_01 = tof + g_eb_time_Emax_01[i] + genVertexT -tvirtual;
         
-	g_tof[i] = tof;
-	g_tvirtual[i] = tvirtual;
 	gen_time[i] = mimic_gen_time;
 	gen_time_max_02[i] = mimic_gen_time_max_02;
 	gen_time_max_01[i] = mimic_gen_time_max_01;
