@@ -187,6 +187,10 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("g_cnt_sc_02", &g_cnt_sc_02, "g_cnt_sc_02[nGenParticles]/I");
  ecalTPTree->Branch("g_tmax_sc_02", &g_tmax_sc_02, "g_tmax_sc_02[nGenParticles]/F");
  ecalTPTree->Branch("g_tmin_sc_02", &g_tmin_sc_02, "g_tmin_sc_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sm_02", &g_dt_sm_02, "g_dt_sm_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sm_02", &g_cnt_sm_02, "g_cnt_sm_02[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmax_sm_02", &g_tmax_sm_02, "g_tmax_sm_02[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmin_sm_02", &g_tmin_sm_02, "g_tmin_sm_02[nGenParticles]/F");
  ecalTPTree->Branch("genEsc_02", &genEsc_02, "genEsc_02[nGenParticles]/F");
  ecalTPTree->Branch("gE9x9_02", &gE9x9_02, "gE9x9_02[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_02", &gE5x5_02, "gE5x5_02[nGenParticles]/F");
@@ -201,6 +205,28 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("g_tmax_sc_01", &g_tmax_sc_01, "g_tmax_sc_01[nGenParticles]/F");
  ecalTPTree->Branch("g_cnt_sc_01", &g_cnt_sc_01, "g_cnt_sc_01[nGenParticles]/I");
  ecalTPTree->Branch("g_tmin_sc_01", &g_tmin_sc_01, "g_tmin_sc_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sm_01", &g_dt_sm_01, "g_dt_sm_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmax_sm_01", &g_tmax_sm_01, "g_tmax_sm_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sm_01", &g_cnt_sm_01, "g_cnt_sm_01[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmin_sm_01", &g_tmin_sm_01, "g_tmin_sm_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sm2_01", &g_dt_sm2_01, "g_dt_sm2_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmax_sm2_01", &g_tmax_sm2_01, "g_tmax_sm2_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sm2_01", &g_cnt_sm2_01, "g_cnt_sm2_01[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmin_sm2_01", &g_tmin_sm2_01, "g_tmin_sm2_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sm5_01", &g_dt_sm5_01, "g_dt_sm5_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmax_sm5_01", &g_tmax_sm5_01, "g_tmax_sm5_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sm5_01", &g_cnt_sm5_01, "g_cnt_sm5_01[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmin_sm5_01", &g_tmin_sm5_01, "g_tmin_sm5_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_sm10_01", &g_dt_sm10_01, "g_dt_sm10_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_tmax_sm10_01", &g_tmax_sm10_01, "g_tmax_sm10_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_cnt_sm10_01", &g_cnt_sm10_01, "g_cnt_sm10_01[nGenParticles]/I");
+ ecalTPTree->Branch("g_tmin_sm10_01", &g_tmin_sm10_01, "g_tmin_sm10_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_max_01", &g_dt_max_01, "g_dt_max_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_t_max_01", &g_t_max_01, "g_t_max_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_e_max_01", &g_e_max_01, "g_e_max_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_dt_min_01", &g_dt_min_01, "g_dt_min_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_t_min_01", &g_t_min_01, "g_t_min_01[nGenParticles]/F");
+ ecalTPTree->Branch("g_e_min_01", &g_e_min_01, "g_e_min_01[nGenParticles]/F");
  ecalTPTree->Branch("genEsc_01", &genEsc_01, "genEsc_01[nGenParticles]/F");
  ecalTPTree->Branch("gE9x9_01", &gE9x9_01, "gE9x9_01[nGenParticles]/F");
  ecalTPTree->Branch("gE5x5_01", &gE5x5_01, "gE5x5_01[nGenParticles]/F");
@@ -461,6 +487,10 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  g_tmax_sc_02[i] = -666.;
  g_cnt_sc_02[i] = -666;
  g_tmin_sc_02[i] = -666.;
+ g_dt_sm_02[i] = -666.;
+ g_tmax_sm_02[i] = -666.;
+ g_cnt_sm_02[i] = -666;
+ g_tmin_sm_02[i] = -666.;
  gEsc_02[i] = -666.;
  genEsc_02[i] = -666.;
  gE9x9_02[i] = -666.;
@@ -475,6 +505,28 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  g_tmax_sc_01[i] = -666.;
  g_cnt_sc_01[i] = -666;
  g_tmin_sc_01[i] = -666.;
+ g_dt_sm_01[i] = -666.;
+ g_tmax_sm_01[i] = -666.;
+ g_cnt_sm_01[i] = -666;
+ g_tmin_sm_01[i] = -666.;
+ g_dt_sm2_01[i] = -666.;
+ g_tmax_sm2_01[i] = -666.;
+ g_cnt_sm2_01[i] = -666;
+ g_tmin_sm2_01[i] = -666.;
+ g_dt_sm5_01[i] = -666.;
+ g_tmax_sm5_01[i] = -666.;
+ g_cnt_sm5_01[i] = -666;
+ g_tmin_sm5_01[i] = -666.;
+ g_dt_sm10_01[i] = -666.;
+ g_tmax_sm10_01[i] = -666.;
+ g_cnt_sm10_01[i] = -666;
+ g_tmin_sm10_01[i] = -666.;
+ g_dt_max_01[i] = -666.;
+ g_t_max_01[i] = -666.;
+ g_e_max_01[i] = -666.;
+ g_dt_min_01[i] = -666.;
+ g_t_min_01[i] = -666.;
+ g_e_min_01[i] = -666.;
  gEsc_01[i] = -666.;
  genEsc_01[i] = -666.;
  gE9x9_01[i] = -666.;
@@ -1049,6 +1101,25 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	float min_sc_02 = 666.;
 	float max_sc_01 = 0.;
 	float min_sc_01 = 666.;
+	int cnt_sm_02 = 0;
+	int cnt_sm_01 = 0;
+	float max_sm_02 = 0.;
+	float min_sm_02 = 666.;
+	float max_sm_01 = 0.;
+	float min_sm_01 = 666.;
+	int cnt_sm2_01 = 0;
+	float max_sm2_01 = 0.;
+	float min_sm2_01 = 666.;
+	int cnt_sm5_01 = 0;
+	float max_sm5_01 = 0.;
+	float min_sm5_01 = 666.;
+	int cnt_sm10_01 = 0;
+	float max_sm10_01 = 0.;
+	float min_sm10_01 = 666.;
+	float t_max_01 = 0.;
+	float t_min_01 = 0.;
+	float e_max_01 = 0.;
+	float e_min_01 = 6000.;
 	float t1 = 0.;
 	float t2 = 0.;
 	float Egen_sc_02 = gen.energy();
@@ -1060,7 +1131,7 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		if( abs(neighbor.eta()) >= 1.5) continue;
         	float distance = deltaR(gen.eta(), gen.phi(), genParticles[q].eta(), genParticles[q].phi());
 
-		if(gen.pdgId()==neighbor.pdgId() && distance<0.2)
+		if(gen.pdgId()==neighbor.pdgId() && distance<0.2 && q!=i)
 		{
 			Egen_sc_02 += neighbor.energy();
 
@@ -1074,6 +1145,19 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
 			cnt_sc_02++;
 
+			//if(gParticleMotherIndex[q] == gParticleMotherIndex[i])
+			if(neighbor.energy()>1)
+			{
+	
+				if(t2 >= max_sm_02)
+					max_sm_02 = t2;
+				if(t2 <= min_sm_02 && t2>0)
+					min_sm_02 = t2;
+	
+				cnt_sm_02++;
+
+			}
+
 
 			if(distance<0.1)
 			{
@@ -1084,13 +1168,74 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
 				if(t1 >= max_sc_01)
 					max_sc_01 = t1;
-				if(t1 <= min_sc_01 && t2>0)
+				if(t1 <= min_sc_01 && t1>0)
 					min_sc_01 = t1;
 
+
+				if(neighbor.energy() >= e_max_01)
+				{
+					e_max_01 = neighbor.energy();
+					t_max_01 = t1;
+				}
+				if(neighbor.energy() <= e_min_01 && t1>0)
+				{
+					e_min_01 = neighbor.energy();
+					t_min_01 = t1;
+				}
+
 	//if(t1>0 && g_tof[q]>0 && tof>0 && max_sc_01>0 && min_sc_01>0) std::cout<<"index " <<i << " dr 0.1 " << t1 << " " << g_tof[q] <<" "  << g_tof[i] <<" " << " max " << max_sc_01 <<  " min " << min_sc_01 <<std::endl;
-	std::cout<<"index " <<i << " dr 0.1, index q: "<< q << " t1:  " << t1 << " t1 origin (include -666) :  " << g_tof[q] <<" compare to core: "  << g_tof[i] <<" result " << " max: " << max_sc_01 <<  " min: " << min_sc_01 <<std::endl;
+	//std::cout<<"index " <<i << " dr 0.1, index q: "<< q << " t1:  " << t1 << " t1 origin (include -666) :  " << g_tof[q] <<" compare to core: "  << g_tof[i] <<" result " << " max: " << max_sc_01 <<  " min: " << min_sc_01 <<std::endl;
 
 				cnt_sc_01++;
+
+				//if(gParticleMotherIndex[q] == gParticleMotherIndex[i])
+				if(neighbor.energy()>1)
+				{
+	
+					if(t1 >= max_sm_01)
+						max_sm_01 = t1;
+					if(t1 <= min_sm_01 && t1>0)
+						min_sm_01 = t1;
+	
+					cnt_sm_01++;
+
+				}
+
+				if(neighbor.energy()>2)
+				{
+	
+					if(t1 >= max_sm2_01)
+						max_sm2_01 = t1;
+					if(t1 <= min_sm2_01 && t1>0)
+						min_sm2_01 = t1;
+	
+					cnt_sm2_01++;
+
+				}
+
+				if(neighbor.energy()>5)
+				{
+	
+					if(t1 >= max_sm5_01)
+						max_sm5_01 = t1;
+					if(t1 <= min_sm5_01 && t1>0)
+						min_sm5_01 = t1;
+	
+					cnt_sm5_01++;
+
+				}
+
+				if(neighbor.energy()>10)
+				{
+	
+					if(t1 >= max_sm10_01)
+						max_sm10_01 = t1;
+					if(t1 <= min_sm10_01 && t1>0)
+						min_sm10_01 = t1;
+	
+					cnt_sm10_01++;
+
+				}
 
 			}//dr 0.1
 
@@ -1111,6 +1256,47 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
 	g_dt_sc_02[i] = max_sc_02 - min_sc_02;
 	g_dt_sc_01[i] = max_sc_01 - min_sc_01;
+
+	if(min_sm_02==666) min_sm_02 =0.;
+	if(min_sm_01==666) min_sm_01 =0.;
+
+	g_cnt_sm_02[i] = cnt_sm_02;
+	g_cnt_sm_01[i] = cnt_sm_01;
+
+	g_tmax_sm_02[i] = max_sm_02;
+	g_tmax_sm_01[i] = max_sm_01;
+	g_tmin_sm_02[i] = min_sm_02;
+	g_tmin_sm_01[i] = min_sm_01;
+
+	g_dt_sm_02[i] = max_sm_02 - min_sm_02;
+	g_dt_sm_01[i] = max_sm_01 - min_sm_01;
+
+	if(min_sm2_01==666) min_sm2_01 =0.;
+	g_cnt_sm2_01[i] = cnt_sm2_01;
+	g_tmax_sm2_01[i] = max_sm2_01;
+	g_tmin_sm2_01[i] = min_sm2_01;
+	g_dt_sm2_01[i] = max_sm2_01 - min_sm2_01;
+
+	if(min_sm5_01==666) min_sm5_01 =0.;
+	g_cnt_sm5_01[i] = cnt_sm5_01;
+	g_tmax_sm5_01[i] = max_sm5_01;
+	g_tmin_sm5_01[i] = min_sm5_01;
+	g_dt_sm5_01[i] = max_sm5_01 - min_sm5_01;
+
+	if(min_sm10_01==666) min_sm10_01 =0.;
+	g_cnt_sm10_01[i] = cnt_sm10_01;
+	g_tmax_sm10_01[i] = max_sm10_01;
+	g_tmin_sm10_01[i] = min_sm10_01;
+	g_dt_sm10_01[i] = max_sm10_01 - min_sm10_01;
+
+	g_e_max_01[i] = e_max_01;
+	g_t_max_01[i] = t_max_01;
+	g_dt_max_01[i] = g_tof[i] - t_max_01;
+
+	if(e_min_01==6000) e_min_01 =0.;
+	g_e_min_01[i] = e_min_01;
+	g_t_min_01[i] = t_min_01;
+	g_dt_min_01[i] = g_tof[i] - t_min_01;
 
 	genEsc_02[i] = Egen_sc_02;
 	genEsc_01[i] = Egen_sc_01;
