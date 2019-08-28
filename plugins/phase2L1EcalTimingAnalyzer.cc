@@ -232,6 +232,10 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
  ecalTPTree->Branch("gE5x5_01", &gE5x5_01, "gE5x5_01[nGenParticles]/F");
  ecalTPTree->Branch("gE3x3_01", &gE3x3_01, "gE3x3_01[nGenParticles]/F");
 
+ ecalTPTree->Branch("g_mindr", &g_mindr, "g_mindr[nGenParticles]/F");
+ ecalTPTree->Branch("g_e_mindr", &g_e_mindr, "g_e_mindr[nGenParticles]/F");
+ ecalTPTree->Branch("g_t_mindr", &g_t_mindr, "g_t_mindr[nGenParticles]/F");
+
  ecalTPTree->Branch("gIcore", &gIcore, "gIcore[nGenParticles]/I");
  ecalTPTree->Branch("g_eb_time", &g_eb_time, "g_eb_time[nGenParticles]/F");
  ecalTPTree->Branch("g_eb_sigmat", &g_eb_sigmat, "g_eb_sigmat[nGenParticles]/F");
@@ -532,6 +536,10 @@ void phase2L1EcalTimingAnalyzer::resetGenParticleBranches(){
  gE9x9_01[i] = -666.;
  gE5x5_01[i] = -666.;
  gE3x3_01[i] = -666.;
+
+ g_mindr[i] = -666.;
+ g_e_mindr[i] = -666.;
+ g_t_mindr[i] = -666.;
 
  gIcore[i] = -666;
  g_eb_time[i] = -666.;
@@ -1055,7 +1063,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 //    reco::GenParticle gen = genParticles[i];
 //
 	//corr eta phi to origin
-	vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
+	//vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
+	vector<float> etaphi = EtaPhi_Corr_EB(gParticle_prod_vtx_x[i], gParticle_prod_vtx_y[i], gParticle_prod_vtx_z[i], gen);
 	float eta = etaphi[0];
 	float phi = etaphi[1];
 	float tof = etaphi[2];
@@ -1077,7 +1086,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	float unit = 2*TMath::Pi()/360;
 
 	//corr eta phi to origin
-	vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
+	//vector<float> etaphi = EtaPhi_Corr_EB(genVertexX, genVertexY, genVertexZ, gen);
+	vector<float> etaphi = EtaPhi_Corr_EB(gParticle_prod_vtx_x[i], gParticle_prod_vtx_y[i], gParticle_prod_vtx_z[i], gen);
 	float eta = etaphi[0];
 	float phi = etaphi[1];
 	float tof = etaphi[2];
@@ -1124,6 +1134,9 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 	float t2 = 0.;
 	float Egen_sc_02 = gen.energy();
 	float Egen_sc_01 = gen.energy();
+	float dr = 666.;
+	float e_mindr = 0.;
+	float t_mindr = 0.;
 
 	for(unsigned int q = 0; q < genParticles.size(); q++)
 	{
@@ -1131,9 +1144,9 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		if( abs(neighbor.eta()) >= 1.5) continue;
         	float distance = deltaR(gen.eta(), gen.phi(), genParticles[q].eta(), genParticles[q].phi());
 
-		if(gen.pdgId()==neighbor.pdgId() && distance<0.2 && q!=i)
+		if(gen.pdgId()==neighbor.pdgId() && distance<0.2 )
 		{
-			Egen_sc_02 += neighbor.energy();
+			if(q!=i) Egen_sc_02 += neighbor.energy();
 
 			if(g_tof[q] == -666) t2 = 0.;	
 			else t2 = g_tof[q];	
@@ -1161,10 +1174,20 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
 			if(distance<0.1)
 			{
-				Egen_sc_01 += neighbor.energy();
+				if(q!=i) Egen_sc_01 += neighbor.energy();
 
 				if(g_tof[q] == -666) t1 = 0.;	
 				else t1 = g_tof[q];	
+
+				if(distance<unit*2)
+				{
+				if(q!=i && gParticle_prod_vtx_x[q]==gParticle_prod_vtx_x[i] && gParticle_prod_vtx_y[q]==gParticle_prod_vtx_y[i] && gParticle_prod_vtx_z[q]==gParticle_prod_vtx_z[i] && distance <= dr)
+				{
+					dr = distance;
+					e_mindr = neighbor.energy();
+					t_mindr = t1;
+				}
+				}
 
 				if(t1 >= max_sc_01)
 					max_sc_01 = t1;
@@ -1242,6 +1265,11 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 		}//dr 0.2
 
 	}
+
+	if(dr==666) dr = 0.;
+	g_mindr[i] = dr;
+	g_e_mindr[i] = e_mindr;
+	g_t_mindr[i] = t_mindr;
 
 	if(min_sc_02==666) min_sc_02 =0.;
 	if(min_sc_01==666) min_sc_01 =0.;
@@ -1708,12 +1736,12 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   // fill event info
   fillEventInfoBranches(iEvent);
   std::cout<<"Finished  fill event info"<<std::endl;
-  //ecal barrel crystals
-  fillEBCrystalBranches(iEvent, iSetup);
-  std::cout<<"Finished  fill ecal barrel crystals"<<std::endl;
   //fill gen info
   fillGenParticleBranches();
   std::cout<<"Finished  fill gen particles"<<std::endl;
+  //ecal barrel crystals
+  fillEBCrystalBranches(iEvent, iSetup);
+  std::cout<<"Finished  fill ecal barrel crystals"<<std::endl;
   //fill jet info
   //fillGenak4JetBranches();
   //fillGenak4JetNoNuBranches();
