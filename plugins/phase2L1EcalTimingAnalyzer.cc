@@ -139,6 +139,10 @@ void phase2L1EcalTimingAnalyzer::enableEBCrystalBranches(){
  ecalTPTree->Branch("eb_cell_Eta", &eb_cell_Eta, "eb_cell_Eta[nCrystals]/F");
  ecalTPTree->Branch("eb_cell_Phi", &eb_cell_Phi, "eb_cell_Phi[nCrystals]/F");
 
+ ecalTPTree->Branch("gen_time_index", &gen_time_index, "gen_time_index[nCrystals]/I");
+ ecalTPTree->Branch("gen_time_e", &gen_time_e, "gen_time_e[nCrystals]/F");
+ ecalTPTree->Branch("gen_time_dr", &gen_time_dr, "gen_time_dr[nCrystals]/F");
+ ecalTPTree->Branch("gen_time_tp", &gen_time_tp, "gen_time_tp[nCrystals]/F");
 };
 
 void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
@@ -311,6 +315,10 @@ void phase2L1EcalTimingAnalyzer::enableGenak4JetNoNuBranches(){
  //jet info
  ecalTPTree->Branch("nGenak4JetNoNus", &nGenak4JetNoNus, "nGenak4JetNoNus/I");
 
+ ecalTPTree->Branch("gak4JetNoNuTime", &gak4JetNoNuTime, "gak4JetNoNuTime[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum", &gak4JetNoNuEsum, "gak4JetNoNuEsum[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t", &gak4JetNoNuEsum_t, "gak4JetNoNuEsum_t[nGenak4JetNoNus]/F");
+
  ecalTPTree->Branch("gak4JetNoNuMass", &gak4JetNoNuMass, "gak4JetNoNuMass[nGenak4JetNoNus]/F");
  ecalTPTree->Branch("gak4JetNoNuE", &gak4JetNoNuE, "gak4JetNoNuE[nGenak4JetNoNus]/F");
  ecalTPTree->Branch("gak4JetNoNuEt", &gak4JetNoNuEt, "gak4JetNoNuEt[nGenak4JetNoNus]/F");
@@ -440,6 +448,11 @@ void phase2L1EcalTimingAnalyzer::resetEBCrystalBranches(){
  eb_ic[i]       = -666;
  eb_cell_Eta[i] = -666.;
  eb_cell_Phi[i] = -666.;
+
+ gen_time_index[i]     = -666;
+ gen_time_e[i]     = -666.;
+ gen_time_dr[i]     = -666.;
+ gen_time_tp[i]     = -666.;
  }
 
 };
@@ -622,6 +635,10 @@ void phase2L1EcalTimingAnalyzer::resetGenak4JetNoNuBranches(){
  nGenak4JetNoNus = 0;
 
  for(int i=0; i<GENJETARRAYSIZE; i++){
+ gak4JetNoNuTime[i] = -666.;
+ gak4JetNoNuEsum[i] = -666.;
+ gak4JetNoNuEsum_t[i] = -666.;
+
  gak4JetNoNuMass[i] = -666.;
  gak4JetNoNuE[i]    = -666.;
  gak4JetNoNuEt[i]   = -666.;
@@ -731,6 +748,9 @@ bool phase2L1EcalTimingAnalyzer::fillEventInfoBranches(const edm::Event& iEvent)
 };
 
 bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+//bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup, std::vector<reco::GenParticle> genParticles){
+
+  std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
 
   edm::ESHandle<CaloGeometry> caloGeometryHandle;
   iSetup.get<CaloGeometryRecord>().get(caloGeometryHandle);
@@ -778,35 +798,88 @@ bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent,
 	      //if(et<0.001) continue;
 	      //float energy = et / sin(position.theta());
 	      eb_Et[nCrystals-1] = et;
-	      eb_Edep[nCrystals-1] = Et_to_E(et, tpg.id().ieta());
+	      //eb_Edep[nCrystals-1] = Et_to_E(et, tpg.id().ieta());
+	      float e = Et_to_E(et, tpg.id().ieta());
+	      eb_Edep[nCrystals-1] = e;
 	      //eb_time[nCrystals-1] = tpg.time();
-	      float sigma_t = pow(et,-0.34242268082)*0.121; //similar to eta=0 lumi 300/fb
+	      float sigma_t = pow(e, -0.34242268082)*0.121; //similar to eta=0 lumi 300/fb
 	      std::random_device rd;
-	      std::default_random_engine generator;
+	      //std::default_random_engine generator;
+	      std::mt19937 generator(rd());
               std::normal_distribution<float> distribution(0,sigma_t);
               eb_time[nCrystals-1] = distribution(generator);  // generates number
               eb_sigmat[nCrystals-1] = sigma_t;  // generates number
-	      //stsigma_ttime[nCrystals-1] <<std::endl;
+	      //std::cout<<eb_time[nCrystals-1] <<std::endl;
 	      //float sigma_t = TMath::pow(et,-0.34242268082)*0.121
 	//std::cout<<"time " << tpg.time()<<std::endl;
 	}
+  	
+	float unit = 2*TMath::Pi()/360;
+	float time_tp = -666.;
+	float deltar = 666.;
+	float distance = 666.;
+	int index = -666;
+	float e = -666.;
+	float t_crystal = 0.;
+	for(unsigned int i = 0; i< genParticles.size(); i++){
+
+		if(gParticleId[i]==111 && abs(gParticleEta[i]<1.5) )
+		{
+    			reco::GenParticle gen = genParticles[i];
+
+			vector<float> etaphi = EtaPhi_Corr_EB(gParticle_prod_vtx_x[i], gParticle_prod_vtx_y[i], gParticle_prod_vtx_z[i], gen);
+			float gen_eta = etaphi[0];
+			float gen_phi = etaphi[1];
+			float gen_tof = etaphi[2];
+			float gen_tvirtual = etaphi[3];
+
+	      		//std::cout<<gen_eta <<" , "<< eta <<std::endl;
+			//dr between pi0 and crystal
+			distance = deltaR(gen_eta, gen_phi, eta, phi);
+
+			if(distance<2*unit)
+			{
+	      		//std::cout<<distance <<" , "<< dr <<std::endl;
+				if(distance <= deltar)
+				{
+					index = i;
+					e = gen.energy();
+					deltar = deltaR(gen_eta, gen_phi, eta, phi);
+					if(eb_time[nCrystals-1]==-666) t_crystal = 0.;
+					else t_crystal = eb_time[nCrystals-1];
+					time_tp = gen_tof + genVertexT + t_crystal - gen_tvirtual;
+	      				//std::cout<<distance <<" , "<< dr << " , time_tp "<< time_tp << " , gen_tof " << gen_tof << " , genVertexT " << genVertexT << ", eb_time[nCrystal-1] "<< eb_time[nCrystals-1] << ", gen_tvirtual " << gen_tvirtual<<std::endl;
+					
+				}	
+
+			}
+			
+		}
+	}//match TP to close/fast pi0
+	      		//std::cout<<distance <<" , "<< dr <<std::endl;
+
+	//if(deltar = 666) time_tp = -666;
+	
+	gen_time_index[nCrystals-1] = index;
+	gen_time_e[nCrystals-1] = e;
+	gen_time_dr[nCrystals-1] = deltar;
+	gen_time_tp[nCrystals-1] = time_tp;
     }
   return true;
 };
 
-bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
-
-//  std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
-//  phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches( genParticles);
+bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){ 
+  std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
+  phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches( genParticles);
 //  phase2L1EcalTimingAnalyzer::fillGenParticleMotherBranches( genParticles);
 //  phase2L1EcalTimingAnalyzer::fillGenParticleGrandMotherBranches( genParticles);
 //  //phase2L1EcalTimingAnalyzer::fillGenParticleSiblingBranches( genParticles);
 //  phase2L1EcalTimingAnalyzer::fillGenParticleTPBranches( genParticles);
-//  return true;
-//};
+  return true;
+};
 //  //fill gen info
 //  
-//std::vector<reco::GenParticle>  phase2L1EcalTimingAnalyzer::GetGenParticles(){
+std::vector<reco::GenParticle>  phase2L1EcalTimingAnalyzer::GetGenParticles(){
   // Get genParticles
   std::vector<reco::GenParticle> genParticles;
   
@@ -862,11 +935,11 @@ bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){
 
   genVertexT = *genVertexTHandle;
 
-//  return genParticles;
-//};
+  return genParticles;
+};
 //
 //
-//bool phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches(std::vector<reco::GenParticle> genParticles){
+bool phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches(std::vector<reco::GenParticle> genParticles){
 //  //std::cout<<"Finished  fill gen vtx"<<std::endl;
 
   nGenParticles = genParticles.size();
@@ -1582,6 +1655,38 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 	//gak4JetNoNuChargedHadronEnergy[nGenak4JetNoNus-1] = jet.chargedHadronEnergy();
 	//gak4JetNoNuNeutralHadronEnergy[nGenak4JetNoNus-1] = jet.neutralHadronEnergy();
 
+	float Edep = 0.;
+	float Edep_sum = 0.;
+	float Edep_sum_temp = 0.;
+	float jet_time_temp = 0.;
+
+	for(unsigned int k=0; k<61200; k++){
+		float eb_eta = eb_cell_Eta[k];
+		float eb_phi = eb_cell_Phi[k];
+		float deltaR_eb_jet = deltaR(eb_eta, eb_phi, jet.eta(), jet.phi()); 
+
+		if(eb_Et[k]!=-666 ) Edep = eb_Edep[k];
+		else Edep = 0.;
+
+		//find cells within cone 0.4
+		if(deltaR_eb_jet < 0.4 ){
+			Edep_sum += Edep;
+			if(gen_time_tp[k]!=-666){
+				Edep_sum_temp += Edep;
+				jet_time_temp += gen_time_tp[k]*Edep;
+				//if(Edep!=0) std::cout<<"in loop TP sum E" << Edep_sum<<"TP time temp"<<jet_time_temp <<" Edep "<< Edep<< std::endl;
+			}
+		}//0.4
+		
+	}//loop of TP
+
+	float jet_time = jet_time_temp/Edep_sum;
+	gak4JetNoNuTime[nGenak4JetNoNus-1] = jet_time;	
+	gak4JetNoNuEsum[nGenak4JetNoNus-1] = Edep_sum;	
+	gak4JetNoNuEsum_t[nGenak4JetNoNus-1] = Edep_sum_temp;	
+
+	//std::cout<<" TP sum E" << Edep_sum<<"TP time temp"<<jet_time_temp <<"time "<< jet_time<< std::endl;
+	//std::cout<<" TP" << eb_time[0]<<eb_ieta[0] << eb_Et[0]<<eb_Edep[0]<<eb_id[0]<< std::endl;
 	//std::cout<<" Gen ak4JetNoNu " << nGenak4JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
 	//std::cout<<" Gen ak4JetNoNu " << nGenak4JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
   }
@@ -1741,10 +1846,11 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   std::cout<<"Finished  fill gen particles"<<std::endl;
   //ecal barrel crystals
   fillEBCrystalBranches(iEvent, iSetup);
+  //fillEBCrystalBranches(iEvent, iSetup, genParticles);
   std::cout<<"Finished  fill ecal barrel crystals"<<std::endl;
   //fill jet info
   //fillGenak4JetBranches();
-  //fillGenak4JetNoNuBranches();
+  fillGenak4JetNoNuBranches();
   //fillGenak8JetBranches();
   //fillGenak8JetNoNuBranches();
 

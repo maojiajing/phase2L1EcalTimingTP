@@ -149,15 +149,17 @@ public:
 
 // ------------ fill branches  ------------
   bool fillEventInfoBranches(const edm::Event& iEvent);
-  bool fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
   bool fillGenParticleBranches();
-  //std::vector<reco::GenParticle> GetGenParticles();
-  //bool fillGenParticleBasicBranches(std::vector<reco::GenParticle> genParticles);
+  std::vector<reco::GenParticle> GetGenParticles();
+  bool fillGenParticleBasicBranches(std::vector<reco::GenParticle> genParticles);
   //bool fillGenParticleMotherBranches(std::vector<reco::GenParticle> genParticles);
   //bool fillGenParticleGrandMotherBranches(std::vector<reco::GenParticle> genParticles);
   //bool fillGenParticleSiblingBranches(std::vector<reco::GenParticle> genParticles);
   //bool fillGenParticleTPBranches(std::vector<reco::GenParticle> genParticles);
+  
+  bool fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+  //bool fillEBCrystalBranches(const edm::Event& iEvent, const edm::EventSetup& iSetup, std::vector<reco::GenParticle> genParticles);
 
   bool fillGenak4JetBranches();
   bool fillGenak4JetNoNuBranches();
@@ -223,6 +225,10 @@ private:
  int eb_ic[EBCRYSTALARRAYSIZE];
  float eb_cell_Eta[EBCRYSTALARRAYSIZE];
  float eb_cell_Phi[EBCRYSTALARRAYSIZE];
+ int gen_time_index[EBCRYSTALARRAYSIZE];
+ float gen_time_e[EBCRYSTALARRAYSIZE];
+ float gen_time_dr[EBCRYSTALARRAYSIZE];
+ float gen_time_tp[EBCRYSTALARRAYSIZE];
 
  //ak4 jet info
  int nGenak4Jets;
@@ -255,6 +261,10 @@ private:
 
  // ak4 jet nonu info
  int nGenak4JetNoNus;
+
+ float gak4JetNoNuTime[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t[GENJETARRAYSIZE];
 
  float gak4JetNoNuMass[GENJETARRAYSIZE];
  float gak4JetNoNuE[GENJETARRAYSIZE];
