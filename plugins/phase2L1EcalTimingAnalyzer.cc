@@ -317,7 +317,20 @@ void phase2L1EcalTimingAnalyzer::enableGenak4JetNoNuBranches(){
 
  ecalTPTree->Branch("gak4JetNoNuTime", &gak4JetNoNuTime, "gak4JetNoNuTime[nGenak4JetNoNus]/F");
  ecalTPTree->Branch("gak4JetNoNuEsum", &gak4JetNoNuEsum, "gak4JetNoNuEsum[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t", &gak4JetNoNuTime_t, "gak4JetNoNuTime_t[nGenak4JetNoNus]/F");
  ecalTPTree->Branch("gak4JetNoNuEsum_t", &gak4JetNoNuEsum_t, "gak4JetNoNuEsum_t[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t0p5", &gak4JetNoNuTime_t0p5, "gak4JetNoNuTime_t0p5[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t0p5", &gak4JetNoNuEsum_t0p5, "gak4JetNoNuEsum_t0p5[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t1", &gak4JetNoNuTime_t1, "gak4JetNoNuTime_t1[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t1", &gak4JetNoNuEsum_t1, "gak4JetNoNuEsum_t1[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t2", &gak4JetNoNuTime_t2, "gak4JetNoNuTime_t2[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t2", &gak4JetNoNuEsum_t2, "gak4JetNoNuEsum_t2[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t3", &gak4JetNoNuTime_t3, "gak4JetNoNuTime_t3[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t3", &gak4JetNoNuEsum_t3, "gak4JetNoNuEsum_t3[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t5", &gak4JetNoNuTime_t5, "gak4JetNoNuTime_t5[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t5", &gak4JetNoNuEsum_t5, "gak4JetNoNuEsum_t5[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuTime_t10", &gak4JetNoNuTime_t10, "gak4JetNoNuTime_t10[nGenak4JetNoNus]/F");
+ ecalTPTree->Branch("gak4JetNoNuEsum_t10", &gak4JetNoNuEsum_t10, "gak4JetNoNuEsum_t10[nGenak4JetNoNus]/F");
 
  ecalTPTree->Branch("gak4JetNoNuMass", &gak4JetNoNuMass, "gak4JetNoNuMass[nGenak4JetNoNus]/F");
  ecalTPTree->Branch("gak4JetNoNuE", &gak4JetNoNuE, "gak4JetNoNuE[nGenak4JetNoNus]/F");
@@ -637,7 +650,20 @@ void phase2L1EcalTimingAnalyzer::resetGenak4JetNoNuBranches(){
  for(int i=0; i<GENJETARRAYSIZE; i++){
  gak4JetNoNuTime[i] = -666.;
  gak4JetNoNuEsum[i] = -666.;
+ gak4JetNoNuTime_t[i] = -666.;
  gak4JetNoNuEsum_t[i] = -666.;
+ gak4JetNoNuTime_t0p5[i] = -666.;
+ gak4JetNoNuEsum_t0p5[i] = -666.;
+ gak4JetNoNuTime_t1[i] = -666.;
+ gak4JetNoNuEsum_t1[i] = -666.;
+ gak4JetNoNuTime_t2[i] = -666.;
+ gak4JetNoNuEsum_t2[i] = -666.;
+ gak4JetNoNuTime_t3[i] = -666.;
+ gak4JetNoNuEsum_t3[i] = -666.;
+ gak4JetNoNuTime_t5[i] = -666.;
+ gak4JetNoNuEsum_t5[i] = -666.;
+ gak4JetNoNuTime_t10[i] = -666.;
+ gak4JetNoNuEsum_t10[i] = -666.;
 
  gak4JetNoNuMass[i] = -666.;
  gak4JetNoNuE[i]    = -666.;
@@ -1659,6 +1685,18 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 	float Edep_sum = 0.;
 	float Edep_sum_temp = 0.;
 	float jet_time_temp = 0.;
+	float Edep_sum_temp0p5 = 0.;
+	float jet_time_temp0p5 = 0.;
+	float Edep_sum_temp1 = 0.;
+	float jet_time_temp1 = 0.;
+	float Edep_sum_temp2 = 0.;
+	float jet_time_temp2 = 0.;
+	float Edep_sum_temp3 = 0.;
+	float jet_time_temp3 = 0.;
+	float Edep_sum_temp5 = 0.;
+	float jet_time_temp5 = 0.;
+	float Edep_sum_temp10 = 0.;
+	float jet_time_temp10 = 0.;
 
 	for(unsigned int k=0; k<61200; k++){
 		float eb_eta = eb_cell_Eta[k];
@@ -1671,10 +1709,41 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 		//find cells within cone 0.4
 		if(deltaR_eb_jet < 0.4 ){
 			Edep_sum += Edep;
-			if(gen_time_tp[k]!=-666){
+			if(gen_time_tp[k]!=-666)
+			{
 				Edep_sum_temp += Edep;
 				jet_time_temp += gen_time_tp[k]*Edep;
 				//if(Edep!=0) std::cout<<"in loop TP sum E" << Edep_sum<<"TP time temp"<<jet_time_temp <<" Edep "<< Edep<< std::endl;
+				if(Edep>0.5)
+				{
+					Edep_sum_temp0p5 += Edep;
+					jet_time_temp0p5 += gen_time_tp[k]*Edep;
+				if(Edep>1)
+				{
+					Edep_sum_temp1 += Edep;
+					jet_time_temp1 += gen_time_tp[k]*Edep;
+				if(Edep>2)
+				{
+					Edep_sum_temp2 += Edep;
+					jet_time_temp2 += gen_time_tp[k]*Edep;
+				if(Edep>3)
+				{
+					Edep_sum_temp3 += Edep;
+					jet_time_temp3 += gen_time_tp[k]*Edep;
+				if(Edep>5)
+				{
+					Edep_sum_temp5 += Edep;
+					jet_time_temp5 += gen_time_tp[k]*Edep;
+				if(Edep>10)
+				{
+					Edep_sum_temp10 += Edep;
+					jet_time_temp10 += gen_time_tp[k]*Edep;
+				}//10
+				}//5
+				}//3
+				}//2
+				}//1
+				}//0.5
 			}
 		}//0.4
 		
@@ -1683,7 +1752,34 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 	float jet_time = jet_time_temp/Edep_sum;
 	gak4JetNoNuTime[nGenak4JetNoNus-1] = jet_time;	
 	gak4JetNoNuEsum[nGenak4JetNoNus-1] = Edep_sum;	
+
+	float jet_time_t = jet_time_temp/Edep_sum_temp;
+	gak4JetNoNuTime_t[nGenak4JetNoNus-1] = jet_time_t;	
 	gak4JetNoNuEsum_t[nGenak4JetNoNus-1] = Edep_sum_temp;	
+
+	float jet_time_t0p5 = jet_time_temp0p5/Edep_sum_temp0p5;
+	gak4JetNoNuTime_t0p5[nGenak4JetNoNus-1] = jet_time_t0p5;	
+	gak4JetNoNuEsum_t0p5[nGenak4JetNoNus-1] = Edep_sum_temp0p5;	
+
+	float jet_time_t1 = jet_time_temp1/Edep_sum_temp1;
+	gak4JetNoNuTime_t1[nGenak4JetNoNus-1] = jet_time_t1;	
+	gak4JetNoNuEsum_t1[nGenak4JetNoNus-1] = Edep_sum_temp1;	
+
+	float jet_time_t2 = jet_time_temp2/Edep_sum_temp2;
+	gak4JetNoNuTime_t2[nGenak4JetNoNus-1] = jet_time_t2;	
+	gak4JetNoNuEsum_t2[nGenak4JetNoNus-1] = Edep_sum_temp2;	
+
+	float jet_time_t3 = jet_time_temp3/Edep_sum_temp3;
+	gak4JetNoNuTime_t3[nGenak4JetNoNus-1] = jet_time_t3;	
+	gak4JetNoNuEsum_t3[nGenak4JetNoNus-1] = Edep_sum_temp3;	
+
+	float jet_time_t5 = jet_time_temp5/Edep_sum_temp5;
+	gak4JetNoNuTime_t5[nGenak4JetNoNus-1] = jet_time_t5;	
+	gak4JetNoNuEsum_t5[nGenak4JetNoNus-1] = Edep_sum_temp5;	
+
+	float jet_time_t10 = jet_time_temp10/Edep_sum_temp10;
+	gak4JetNoNuTime_t10[nGenak4JetNoNus-1] = jet_time_t10;	
+	gak4JetNoNuEsum_t10[nGenak4JetNoNus-1] = Edep_sum_temp10;	
 
 	//std::cout<<" TP sum E" << Edep_sum<<"TP time temp"<<jet_time_temp <<"time "<< jet_time<< std::endl;
 	//std::cout<<" TP" << eb_time[0]<<eb_ieta[0] << eb_Et[0]<<eb_Edep[0]<<eb_id[0]<< std::endl;

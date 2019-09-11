@@ -264,7 +264,20 @@ private:
 
  float gak4JetNoNuTime[GENJETARRAYSIZE];
  float gak4JetNoNuEsum[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t[GENJETARRAYSIZE];
  float gak4JetNoNuEsum_t[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t0p5[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t0p5[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t1[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t1[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t2[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t2[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t3[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t3[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t5[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t5[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t10[GENJETARRAYSIZE];
+ float gak4JetNoNuEsum_t10[GENJETARRAYSIZE];
 
  float gak4JetNoNuMass[GENJETARRAYSIZE];
  float gak4JetNoNuE[GENJETARRAYSIZE];
