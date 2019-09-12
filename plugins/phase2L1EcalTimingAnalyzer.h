@@ -217,7 +217,13 @@ private:
  float eb_Et[EBCRYSTALARRAYSIZE];
  float eb_Edep[EBCRYSTALARRAYSIZE];
  float eb_time[EBCRYSTALARRAYSIZE];
+ float eb_time_60ps[EBCRYSTALARRAYSIZE];
+ float eb_time_100ps[EBCRYSTALARRAYSIZE];
+ float eb_time_60ps_func[EBCRYSTALARRAYSIZE];
+ float eb_time_100ps_func[EBCRYSTALARRAYSIZE];
  float eb_sigmat[EBCRYSTALARRAYSIZE];
+ float eb_sigmat_60ps_func[EBCRYSTALARRAYSIZE];
+ float eb_sigmat_100ps_func[EBCRYSTALARRAYSIZE];
  int eb_id[EBCRYSTALARRAYSIZE];
  int eb_ieta[EBCRYSTALARRAYSIZE];
  int eb_iphi[EBCRYSTALARRAYSIZE];
@@ -229,6 +235,10 @@ private:
  float gen_time_e[EBCRYSTALARRAYSIZE];
  float gen_time_dr[EBCRYSTALARRAYSIZE];
  float gen_time_tp[EBCRYSTALARRAYSIZE];
+ float gen_time_tp_60ps[EBCRYSTALARRAYSIZE];
+ float gen_time_tp_100ps[EBCRYSTALARRAYSIZE];
+ float gen_time_tp_60ps_func[EBCRYSTALARRAYSIZE];
+ float gen_time_tp_100ps_func[EBCRYSTALARRAYSIZE];
 
  //ak4 jet info
  int nGenak4Jets;
@@ -265,6 +275,10 @@ private:
  float gak4JetNoNuTime[GENJETARRAYSIZE];
  float gak4JetNoNuEsum[GENJETARRAYSIZE];
  float gak4JetNoNuTime_t[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t_60ps[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t_100ps[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t_60ps_func[GENJETARRAYSIZE];
+ float gak4JetNoNuTime_t_100ps_func[GENJETARRAYSIZE];
  float gak4JetNoNuEsum_t[GENJETARRAYSIZE];
  float gak4JetNoNuTime_t0p5[GENJETARRAYSIZE];
  float gak4JetNoNuEsum_t0p5[GENJETARRAYSIZE];
