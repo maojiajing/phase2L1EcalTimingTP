@@ -27,6 +27,18 @@ USER_CXXFLAGS="-Wno-delete-non-virtual-dtor -Wno-error=unused-but-set-variable -
 
 cd L1Trigger/phase2L1EcalTimingTP/test
 
-cmsRun test-L1Simulation.py
+# reprocess L1 emulation on phase 2 TTbar or QCD sample
+cmsRun reprocess_test_9_3_7.py
+
+#Output can be found in
+# TTbar
+#'file:/afs/cern.ch/user/j/jmao/work/public/releases/L1_Trigger/MC_Production/FollowCIEMAT/b/CMSSW_10_6_1_patch2/src/step2_2ev_reprocess_slim_jet.root'
+
+#QCD
+#'file:/eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/Phase2/Phase2L1/EcalTimimg/step2_reprocess_slim_qcd.root'
+
+# test ECAL TP
+
+cmsRun test-EcalTPG-jet.py
 ```
 
