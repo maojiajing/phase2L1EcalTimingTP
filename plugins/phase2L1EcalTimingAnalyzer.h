@@ -168,6 +168,7 @@ public:
 
 // ------------corr eta phi  ------------
   vector<float> EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen);
+  vector<float> CalculateTime_EB(float X, float Y, float Z,  float hitX, float hitY, float hitZ);
 
 private:
   virtual void beginJob() override;

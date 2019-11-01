@@ -109,12 +109,12 @@ void phase2L1EcalTimingAnalyzer::loadEvent(const edm::Event& iEvent){
 // ------------ enable branches  ------------
 void phase2L1EcalTimingAnalyzer::setBranches(){
   enableEventInfoBranches();
-  enableEBCrystalBranches();
+  //enableEBCrystalBranches();
   enableGenParticleBranches();
-  enableGenak4JetBranches();
+  //enableGenak4JetBranches();
   enableGenak4JetNoNuBranches();
-  enableGenak8JetBranches();
-  enableGenak8JetNoNuBranches();
+  //enableGenak8JetBranches();
+  //enableGenak8JetNoNuBranches();
 };
 
 void phase2L1EcalTimingAnalyzer::enableEventInfoBranches(){
@@ -812,9 +812,9 @@ bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent,
   ebGeometry = caloGeometry_->getSubdetectorGeometry(DetId::Ecal, EcalBarrel);
 
   //ecal barrel crystals
-  for(auto& tpg : *ecaltpgCollection.product())
-    {
- 	nCrystals++; 
+  for(auto& tpg : *ecaltpgCollection.product()) {
+
+    nCrystals++; 
 
     //std::cout<<"Et " << tpg.encodedEt()<<std::endl;
     //std::cout<<"l1aSpike " << tpg.l1aSpike()<<std::endl;
@@ -825,139 +825,156 @@ bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent,
 	//std::cout<<"tower iEta " << tpg.id().tower_ieta() << " iPhi " << tpg.id().tower_iphi()<<std::endl;
 	std::cout<<"approx Eta " << tpg.id().approxEta() <<std::endl;
 	std::cout<<"time above is not zero " <<std::endl;
-     }
+    }
 
-	eb_id[nCrystals-1] = tpg.id();
-	eb_ieta[nCrystals-1] = tpg.id().ieta();
-	eb_iphi[nCrystals-1] = tpg.id().iphi();
-	eb_ism[nCrystals-1] = tpg.id().ism();
-	eb_ic[nCrystals-1] = tpg.id().ic();
-
-	GlobalVector position;
-	auto cell = ebGeometry->getGeometry(tpg.id());
-	float eta = cell->getPosition().eta();
-	float phi = cell->getPosition().phi();
-	eb_cell_Eta[nCrystals-1] = eta;
-	eb_cell_Phi[nCrystals-1] = phi;
-
-	//std::cout<<"id " << tpg.id().ieta() << tpg.id().iphi() << tpg.id().ism() << tpg.id().ic() <<std::endl;
-	//std::cout<<"approx Eta " << tpg.id().approxEta() <<std::endl;
-	//std::cout<<"cell Eta " << eta << " Phi " << phi <<std::endl;
-	//std::cout<<"Et above is not zero " <<std::endl;
-
-      if(tpg.encodedEt() > 0) 
+    eb_id[nCrystals-1] = tpg.id();
+    eb_ieta[nCrystals-1] = tpg.id().ieta();
+    eb_iphi[nCrystals-1] = tpg.id().iphi();
+    eb_ism[nCrystals-1] = tpg.id().ism();
+    eb_ic[nCrystals-1] = tpg.id().ic();
+    
+    GlobalVector position;
+    auto cell = ebGeometry->getGeometry(tpg.id());
+    float eta = cell->getPosition().eta();
+    float phi = cell->getPosition().phi();
+    float cellX = cell->getPosition().x();
+    float cellY = cell->getPosition().y();
+    float cellZ = cell->getPosition().z();
+    eb_cell_Eta[nCrystals-1] = eta;
+    eb_cell_Phi[nCrystals-1] = phi;
+    
+    //std::cout<<"id " << tpg.id().ieta() << tpg.id().iphi() << tpg.id().ism() << tpg.id().ic() <<std::endl;
+    //std::cout<<"approx Eta " << tpg.id().approxEta() <<std::endl;
+    //std::cout<<"cell Eta " << eta << " Phi " << phi <<std::endl;
+    //std::cout<<"Et above is not zero " <<std::endl;
+    
+    if(tpg.encodedEt() > 0) 
       {
-	      float et = tpg.encodedEt()/8.; // convert ADC to GeV
-
-	      //if(et<0.001) continue;
-	      //float energy = et / sin(position.theta());
-	      eb_Et[nCrystals-1] = et;
-	      //eb_Edep[nCrystals-1] = Et_to_E(et, tpg.id().ieta());
-	      float e = Et_to_E(et, tpg.id().ieta());
-	      eb_Edep[nCrystals-1] = e;
-	      //eb_time[nCrystals-1] = tpg.time();
-	      float sigma_t = pow(e, -0.34242268082)*0.121; //similar to eta=0 lumi 300/fb, e = 20 GeV, sigma_t = 43 ps
-	      float sigma_t_60ps_func = pow(e, -0.34242268082)*0.16736067906; // e = 20 GeV, sigma_t = 60 ps
-	      float sigma_t_100ps_func = pow(e, -0.34242268082)*0.2789344651; // e = 20 GeV, sigma_t = 100 ps
-	      std::random_device rd;
-	      //std::default_random_engine generator;
-	      std::mt19937 generator(rd());
-              std::normal_distribution<float> distribution(0,sigma_t);
-              std::normal_distribution<float> distribution_60ps(0, 0.06);
-              std::normal_distribution<float> distribution_100ps(0, 0.1);
-              std::normal_distribution<float> distribution_60ps_func(0,sigma_t_60ps_func);
-              std::normal_distribution<float> distribution_100ps_func(0,sigma_t_100ps_func);
-              eb_time[nCrystals-1] = distribution(generator);  // generates number
-              eb_time_60ps[nCrystals-1] = distribution_60ps(generator);  // generates number
-              eb_time_100ps[nCrystals-1] = distribution_100ps(generator);  // generates number
-              eb_time_60ps_func[nCrystals-1] = distribution_60ps_func(generator);  // generates number
-              eb_time_100ps_func[nCrystals-1] = distribution_100ps_func(generator);  // generates number
-              eb_sigmat[nCrystals-1] = sigma_t;  // generates number
-              eb_sigmat_60ps_func[nCrystals-1] = sigma_t_60ps_func;  // generates number
-              eb_sigmat_100ps_func[nCrystals-1] = sigma_t_100ps_func;  // generates number
-	      //std::cout<<eb_time[nCrystals-1] <<std::endl;
-	      //float sigma_t = TMath::pow(et,-0.34242268082)*0.121
-	//std::cout<<"time " << tpg.time()<<std::endl;
-	}
-  	
-	float unit = 2*TMath::Pi()/360;
-	float time_tp = -666.;
-	float time_tp_60ps = -666.;
-	float time_tp_100ps = -666.;
-	float time_tp_60ps_func = -666.;
-	float time_tp_100ps_func = -666.;
-	float deltar = 666.;
-	float distance = 666.;
-	int index = -666;
-	float e = -666.;
-	float t_crystal = 0.;
-	float t_crystal_60ps = 0.;
-	float t_crystal_100ps = 0.;
-	float t_crystal_60ps_func = 0.;
-	float t_crystal_100ps_func = 0.;
-	for(unsigned int i = 0; i< genParticles.size(); i++){
-
-		if(gParticleId[i]==111 && abs(gParticleEta[i]<1.5) )
-		{
-    			reco::GenParticle gen = genParticles[i];
-
-			vector<float> etaphi = EtaPhi_Corr_EB(gParticle_prod_vtx_x[i], gParticle_prod_vtx_y[i], gParticle_prod_vtx_z[i], gen);
-			float gen_eta = etaphi[0];
-			float gen_phi = etaphi[1];
-			float gen_tof = etaphi[2];
-			float gen_tvirtual = etaphi[3];
-
-	      		//std::cout<<gen_eta <<" , "<< eta <<std::endl;
-			//dr between pi0 and crystal
-			distance = deltaR(gen_eta, gen_phi, eta, phi);
-
-			if(distance<2*unit)
-			{
-	      		//std::cout<<distance <<" , "<< dr <<std::endl;
-				if(distance <= deltar)
-				{
-					index = i;
-					e = gen.energy();
-					deltar = deltaR(gen_eta, gen_phi, eta, phi);
-					if(eb_time[nCrystals-1]==-666) t_crystal = 0.;
-					else t_crystal = eb_time[nCrystals-1];
-					time_tp = gen_tof + genVertexT + t_crystal - gen_tvirtual;
-
-					if(eb_time_60ps[nCrystals-1]==-666) t_crystal_60ps = 0.;
-					else t_crystal_60ps = eb_time_60ps[nCrystals-1];
-					time_tp_60ps = gen_tof + genVertexT + t_crystal_60ps - gen_tvirtual;
-
-					if(eb_time_100ps[nCrystals-1]==-666) t_crystal_100ps = 0.;
-					else t_crystal_100ps = eb_time_100ps[nCrystals-1];
-					time_tp_100ps = gen_tof + genVertexT + t_crystal_100ps - gen_tvirtual;
-
-					if(eb_time_60ps_func[nCrystals-1]==-666) t_crystal_60ps_func = 0.;
-					else t_crystal_60ps_func = eb_time_60ps_func[nCrystals-1];
-					time_tp_60ps_func = gen_tof + genVertexT + t_crystal_60ps_func - gen_tvirtual;
-
-					if(eb_time_100ps_func[nCrystals-1]==-666) t_crystal_100ps_func = 0.;
-					else t_crystal_100ps_func = eb_time_100ps_func[nCrystals-1];
-					time_tp_100ps_func = gen_tof + genVertexT + t_crystal_100ps_func - gen_tvirtual;
-	      				//std::cout<<distance <<" , "<< dr << " , time_tp "<< time_tp << " , gen_tof " << gen_tof << " , genVertexT " << genVertexT << ", eb_time[nCrystal-1] "<< eb_time[nCrystals-1] << ", gen_tvirtual " << gen_tvirtual<<std::endl;
-					
-				}	
-
-			}
-			
-		}
-	}//match TP to close/fast pi0
-	      		//std::cout<<distance <<" , "<< dr <<std::endl;
-
-	//if(deltar = 666) time_tp = -666;
+	float et = tpg.encodedEt()/8.; // convert ADC to GeV
 	
-	gen_time_index[nCrystals-1] = index;
-	gen_time_e[nCrystals-1] = e;
-	gen_time_dr[nCrystals-1] = deltar;
-	gen_time_tp[nCrystals-1] = time_tp;
-	gen_time_tp_60ps[nCrystals-1] = time_tp_60ps;
-	gen_time_tp_100ps[nCrystals-1] = time_tp_100ps;
-	gen_time_tp_60ps_func[nCrystals-1] = time_tp_60ps_func;
-	gen_time_tp_100ps_func[nCrystals-1] = time_tp_100ps_func;
+	//if(et<0.001) continue;
+	//float energy = et / sin(position.theta());
+	eb_Et[nCrystals-1] = et;
+	//eb_Edep[nCrystals-1] = Et_to_E(et, tpg.id().ieta());
+	float e = Et_to_E(et, tpg.id().ieta());
+	eb_Edep[nCrystals-1] = e;
+	//eb_time[nCrystals-1] = tpg.time();
+	float sigma_t = pow(e, -1)*0.540; //similar to eta=0 lumi 300/fb, e = 20 GeV, sigma_t = 43 ps
+	float sigma_t_60ps_func = pow(e, -1)*1.2; // e = 20 GeV, sigma_t = 60 ps
+	float sigma_t_100ps_func = pow(e, -1)*2.0; // e = 20 GeV, sigma_t = 100 ps
+	std::random_device rd;
+	//std::default_random_engine generator;
+	std::mt19937 generator(rd());
+	std::normal_distribution<float> distribution(0,sigma_t);
+	std::normal_distribution<float> distribution_60ps(0, 0.06);
+	std::normal_distribution<float> distribution_100ps(0, 0.1);
+	std::normal_distribution<float> distribution_60ps_func(0,sigma_t_60ps_func);
+	std::normal_distribution<float> distribution_100ps_func(0,sigma_t_100ps_func);
+	eb_time[nCrystals-1] = distribution(generator);  // generates number
+	eb_time_60ps[nCrystals-1] = distribution_60ps(generator);  // generates number
+	eb_time_100ps[nCrystals-1] = distribution_100ps(generator);  // generates number
+	eb_time_60ps_func[nCrystals-1] = distribution_60ps_func(generator);  // generates number
+	eb_time_100ps_func[nCrystals-1] = distribution_100ps_func(generator);  // generates number
+	eb_sigmat[nCrystals-1] = sigma_t;  // generates number
+	eb_sigmat_60ps_func[nCrystals-1] = sigma_t_60ps_func;  // generates number
+	eb_sigmat_100ps_func[nCrystals-1] = sigma_t_100ps_func;  // generates number
+
+	//std::cout<<eb_time[nCrystals-1] <<std::endl;
+	//float sigma_t = TMath::pow(et,-0.34242268082)*0.121
+	//std::cout<<"time " << tpg.time()<<std::endl;
+
+	//std::cout << "check: " << e << " : " << sigma_t << " | " << eb_time[nCrystals-1] << "\n";
+
+      }
+  	
+    float unit = 2*TMath::Pi()/360;
+    float time_tp = -666.;
+    float time_tp_60ps = -666.;
+    float time_tp_100ps = -666.;
+    float time_tp_60ps_func = -666.;
+    float time_tp_100ps_func = -666.;
+    float deltar = 666.;
+    float distance = 666.;
+    int index = -666;
+    float e = -666.;
+    float t_crystal = 0.;
+    float t_crystal_60ps = 0.;
+    float t_crystal_100ps = 0.;
+    float t_crystal_60ps_func = 0.;
+    float t_crystal_100ps_func = 0.;
+    for(unsigned int i = 0; i< genParticles.size(); i++){
+
+      if(gParticleId[i]==111 && abs(gParticleEta[i]<1.5) )
+	{
+	  reco::GenParticle gen = genParticles[i];
+
+	  vector<float> etaphi = EtaPhi_Corr_EB(gParticle_prod_vtx_x[i], gParticle_prod_vtx_y[i], gParticle_prod_vtx_z[i], gen);
+	  float gen_eta = etaphi[0];
+	  float gen_phi = etaphi[1];
+	  float gen_tof = etaphi[2];
+	  float gen_tvirtual = etaphi[3];
+
+	  //std::cout<<gen_eta <<" , "<< eta <<std::endl;
+	  //dr between pi0 and crystal
+	  distance = deltaR(gen_eta, gen_phi, eta, phi);
+
+	  if(distance<2*unit)
+	    {
+	      //std::cout<<distance <<" , "<< dr <<std::endl;
+	      if(distance <= deltar)
+		{
+		  index = i;
+		  e = gen.energy();
+		  deltar = deltaR(gen_eta, gen_phi, eta, phi);
+		  if(eb_time[nCrystals-1]==-666) t_crystal = 0.;
+		  else t_crystal = eb_time[nCrystals-1];
+		  time_tp = gen_tof + genVertexT + t_crystal - gen_tvirtual;
+
+		  if(eb_time_60ps[nCrystals-1]==-666) t_crystal_60ps = 0.;
+		  else t_crystal_60ps = eb_time_60ps[nCrystals-1];
+		  time_tp_60ps = gen_tof + genVertexT + t_crystal_60ps - gen_tvirtual;
+
+		  if(eb_time_100ps[nCrystals-1]==-666) t_crystal_100ps = 0.;
+		  else t_crystal_100ps = eb_time_100ps[nCrystals-1];
+		  time_tp_100ps = gen_tof + genVertexT + t_crystal_100ps - gen_tvirtual;
+
+		  if(eb_time_60ps_func[nCrystals-1]==-666) t_crystal_60ps_func = 0.;
+		  else t_crystal_60ps_func = eb_time_60ps_func[nCrystals-1];
+		  time_tp_60ps_func = gen_tof + genVertexT + t_crystal_60ps_func - gen_tvirtual;
+
+		  if(eb_time_100ps_func[nCrystals-1]==-666) t_crystal_100ps_func = 0.;
+		  else t_crystal_100ps_func = eb_time_100ps_func[nCrystals-1];
+		  time_tp_100ps_func = gen_tof + genVertexT + t_crystal_100ps_func - gen_tvirtual;
+		  //std::cout<<distance <<" , "<< dr << " , time_tp "<< time_tp << " , gen_tof " << gen_tof << " , genVertexT " << genVertexT << ", eb_time[nCrystal-1] "<< eb_time[nCrystals-1] << ", gen_tvirtual " << gen_tvirtual<<std::endl;
+					
+		}	
+
+	    }
+			
+	}
+    }//match TP to close/fast pi0
+    //std::cout<<distance <<" , "<< dr <<std::endl;
+
+    //if(deltar = 666) time_tp = -666;
+	
+    //if we cannot find a pi0, then use time of an imaginary photon
+    if (time_tp == -666 && tpg.encodedEt() > 0) {
+      vector<float> timeVector = CalculateTime_EB(genVertexX, genVertexY, genVertexZ, cellX, cellY, cellZ);
+      float gen_tof = timeVector[0];
+      float gen_tvirtual = timeVector[1];
+      t_crystal = eb_time[nCrystals-1];
+      time_tp = gen_tof + genVertexT + t_crystal - gen_tvirtual;		        
+    }
+
+
+    gen_time_index[nCrystals-1] = index;
+    gen_time_e[nCrystals-1] = e;
+    gen_time_dr[nCrystals-1] = deltar;
+    gen_time_tp[nCrystals-1] = time_tp;
+    gen_time_tp_60ps[nCrystals-1] = time_tp_60ps;
+    gen_time_tp_100ps[nCrystals-1] = time_tp_100ps;
+    gen_time_tp_60ps_func[nCrystals-1] = time_tp_60ps_func;
+    gen_time_tp_100ps_func[nCrystals-1] = time_tp_100ps_func;
     }
   return true;
 };
@@ -965,10 +982,10 @@ bool phase2L1EcalTimingAnalyzer::fillEBCrystalBranches(const edm::Event& iEvent,
 bool phase2L1EcalTimingAnalyzer::fillGenParticleBranches(){ 
   std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
   phase2L1EcalTimingAnalyzer::fillGenParticleBasicBranches( genParticles);
-//  phase2L1EcalTimingAnalyzer::fillGenParticleMotherBranches( genParticles);
-//  phase2L1EcalTimingAnalyzer::fillGenParticleGrandMotherBranches( genParticles);
-//  //phase2L1EcalTimingAnalyzer::fillGenParticleSiblingBranches( genParticles);
-//  phase2L1EcalTimingAnalyzer::fillGenParticleTPBranches( genParticles);
+  //  phase2L1EcalTimingAnalyzer::fillGenParticleMotherBranches( genParticles);
+  //  phase2L1EcalTimingAnalyzer::fillGenParticleGrandMotherBranches( genParticles);
+  //  //phase2L1EcalTimingAnalyzer::fillGenParticleSiblingBranches( genParticles);
+  //  phase2L1EcalTimingAnalyzer::fillGenParticleTPBranches( genParticles);
   return true;
 };
 //  //fill gen info
@@ -1718,6 +1735,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetBranches(){
 
 bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 
+  std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
+
   //ak4 nonu gen jet info
   //nGenak4JetNoNus = genJetHandle->size();
   for(const reco::GenJet &jet : *genak4JetNoNuHandle){
@@ -1770,6 +1789,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 	float Edep_sum_temp10 = 0.;
 	float jet_time_temp10 = 0.;
 
+	//cout << "GenJEt: " << jet.pt() << " " << jet.eta() << " " << jet.phi() << " " << jet.energy() << "\n";
+
 	for(unsigned int k=0; k<61200; k++){
 		float eb_eta = eb_cell_Eta[k];
 		float eb_phi = eb_cell_Phi[k];
@@ -1783,6 +1804,9 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 			Edep_sum += Edep;
 			if(gen_time_tp[k]!=-666)
 			{
+
+			  //cout << "TP " << Edep << " : " << gen_time_tp[k] << "\n";
+			  
 				Edep_sum_temp += Edep;
 				jet_time_temp += gen_time_tp[k]*Edep;
 				jet_time_temp_60ps += gen_time_tp_60ps[k]*Edep;
@@ -1824,6 +1848,8 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 		}//0.4
 		
 	}//loop of TP
+
+	//cout << "jet time: " << jet_time_temp/Edep_sum << " | Esum = " << Edep_sum << "\n";
 
 	float jet_time = jet_time_temp/Edep_sum;
 	gak4JetNoNuTime[nGenak4JetNoNus-1] = jet_time;	
@@ -1870,7 +1896,65 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
 	//std::cout<<" TP" << eb_time[0]<<eb_ieta[0] << eb_Et[0]<<eb_Edep[0]<<eb_id[0]<< std::endl;
 	//std::cout<<" Gen ak4JetNoNu " << nGenak4JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmEnergy() << " neutral " << jet.neutralEmEnergy() <<std::endl;
 	//std::cout<<" Gen ak4JetNoNu " << nGenak4JetNoNus-1 << " Em energy " << jet.emEnergy()  << " charged " << jet.chargedEmMultiplicity() << " neutral " << jet.neutralEmMultiplicity() <<std::endl;
-  }
+
+
+	//*************************************************************
+	// Debugging Code Below
+	//*************************************************************
+	// if (Edep_sum_temp <= 0 && abs(jet.eta()) < 1.5) {
+	//   cout << "\n\n";
+	//   cout << "GenJet has no time stamp : " << jet.energy() << " " << jet.pt() << " " << jet.eta() << " " << jet.phi() << "\n";
+	//   cout << "ECAL TPs\n";
+	  
+	//   for(unsigned int k=0; k<61200; k++){
+	//     if (eb_Edep[k] == -666) continue;
+
+	//     float eb_eta = eb_cell_Eta[k];
+	//     float eb_phi = eb_cell_Phi[k];
+	//     float deltaR_eb_jet = deltaR(eb_eta, eb_phi, jet.eta(), jet.phi()); 
+
+	//     //find cells within cone 0.4
+	//     if(deltaR_eb_jet < 0.4 ){
+	//       cout << "TP " << k << " : " << eb_eta << " " <<  eb_phi << " | " << deltaR_eb_jet << " | " << eb_Edep[k] << "\n";	   		
+
+	//       for(unsigned int i = 0; i< genParticles.size(); i++){
+	// 	reco::GenParticle gen = genParticles[i];
+		
+	// 	//gammas and pi0s in ecal barrel
+	// 	if( deltaR(genParticles[i].eta(), genParticles[i].phi(), eb_eta , eb_phi ) < 0.05
+	// 	    && ((abs(gen.pdgId())==22 || abs(gen.pdgId())==111) || gen.status() == 1)
+	// 	    ) {
+	// 	  cout << "nearby particle: " << gen.pdgId() << " | " << deltaR(genParticles[i].eta(), genParticles[i].phi(), eb_eta , eb_phi ) << " | "
+	// 	       << gen.pt() << " " << gen.eta() << " " << gen.phi()
+	// 	       << "\n";
+	// 	}
+		
+	//       }
+
+	//       cout << "\n";
+	//     }
+	//   }//loop of TP
+	 
+	//   cout << "\nPi0's nearby\n";	  
+	//   for(unsigned int i = 0; i< genParticles.size(); i++){
+	//     reco::GenParticle gen = genParticles[i];
+
+	//     //gammas and pi0s in ecal barrel
+	//     if( deltaR(genParticles[i].eta(), genParticles[i].phi(), jet.eta() , jet.phi() ) < 0.6
+	// 	&& (abs(gen.pdgId())==22 || abs(gen.pdgId())==111)
+	// 	) {
+	//       cout << "particle: " << gen.pdgId() << " | " << deltaR(genParticles[i].eta(), genParticles[i].phi(), jet.eta() , jet.phi() ) << " | "
+	// 	   << gen.pt() << " " << gen.eta() << " " << gen.phi()
+	// 	   << "\n";
+	//     }
+	    
+	//   } //loop over gen particles
+	// } //if it's a jet with no timestamp
+
+
+
+
+  } //loop over gen jets
 
   return true;
 };
@@ -2001,6 +2085,22 @@ vector<float> phase2L1EcalTimingAnalyzer::EtaPhi_Corr_EB(float X, float Y, float
 };
 
 
+// ------------corr eta phi  ------------
+vector<float> phase2L1EcalTimingAnalyzer::CalculateTime_EB(float X, float Y, float Z, float hitX, float hitY, float hitZ) {
+	//X, Y, Z are for PV
+
+	//gen
+	float dist = sqrt( pow(hitX-X,2) + pow(hitY-Y,2) + pow(hitZ-Z,2) ); 
+	float t_ecal = (1/30.)*(dist)/1.0;
+	
+	float radius_ecal = sqrt( pow(hitX,2) + pow(hitY,2) + pow(hitZ,2));
+	float t_virtual = (1/30.)*radius_ecal / 1.0;
+
+	vector<float> timeVector;
+	timeVector.push_back(t_ecal);
+	timeVector.push_back(t_virtual);
+	return timeVector; 
+};
 
 //
 // member functions
