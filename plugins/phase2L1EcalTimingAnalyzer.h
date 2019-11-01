@@ -53,6 +53,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "DataFormats/L1Trigger/interface/Jet.h"
+
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
@@ -131,6 +133,7 @@ public:
   virtual void setBranches();
   void enableEventInfoBranches();
   void enableEBCrystalBranches();
+  void enableCaloJetBranches();
   void enableGenParticleBranches();
   void enableGenak4JetBranches();
   void enableGenak4JetNoNuBranches();
@@ -165,6 +168,7 @@ public:
   bool fillGenak4JetNoNuBranches();
   bool fillGenak8JetBranches();
   bool fillGenak8JetNoNuBranches();
+  bool fillCaloJetBranches();
 
 // ------------corr eta phi  ------------
   vector<float> EtaPhi_Corr_EB(float X, float Y, float Z, reco::GenParticle gen);
@@ -178,11 +182,12 @@ private:
   // ----------member data ---------------------------
   typedef std::vector<reco::GenParticle> GenParticleCollectionType;
   typedef std::vector<reco::GenJet> GenJetCollectionType;
-
+ 
 
   const CaloSubdetectorGeometry * ebGeometry;
   edm::ESHandle<CaloGeometry> caloGeometry_;
 
+  edm::EDGetTokenT<l1t::JetBxCollection> caloJetToken_;
   edm::EDGetTokenT<std::vector<reco::GenJet> > genak4JetToken_;
   edm::EDGetTokenT<std::vector<reco::GenJet> > genak4JetNoNuToken_;
   edm::EDGetTokenT<std::vector<reco::GenJet> > genak8JetToken_;
@@ -192,6 +197,7 @@ private:
   edm::EDGetTokenT<EcalEBTrigPrimDigiCollection> ecalTPGBToken_;
 
   edm::Handle<EcalEBTrigPrimDigiCollection> ecaltpgCollection;
+  edm::Handle<l1t::JetBxCollection > caloJetHandle;
   edm::Handle<GenJetCollectionType> genak4JetHandle;
   edm::Handle<GenJetCollectionType> genak4JetNoNuHandle;
   edm::Handle<GenJetCollectionType> genak8JetHandle;
@@ -199,6 +205,7 @@ private:
   edm::Handle<GenParticleCollectionType> genParticleHandle;
   edm::Handle<float> genVertexTHandle;
 
+  edm::InputTag caloJetTag_;
   edm::InputTag genSrcak4J_;
   edm::InputTag genSrcak4JN_;
   edm::InputTag genSrcak8J_;
@@ -240,6 +247,23 @@ private:
  float gen_time_tp_100ps[EBCRYSTALARRAYSIZE];
  float gen_time_tp_60ps_func[EBCRYSTALARRAYSIZE];
  float gen_time_tp_100ps_func[EBCRYSTALARRAYSIZE];
+
+
+ // calojet info
+ int nCaloJets;
+ float caloJetE[GENJETARRAYSIZE];
+ float caloJetPt[GENJETARRAYSIZE];
+ float caloJetEta[GENJETARRAYSIZE];
+ float caloJetPhi[GENJETARRAYSIZE];
+ float caloJetTime[GENJETARRAYSIZE];
+ float caloJetEsum[GENJETARRAYSIZE];
+ float caloJetTime_t[GENJETARRAYSIZE];
+ float caloJetTime_t_60ps[GENJETARRAYSIZE];
+ float caloJetTime_t_100ps[GENJETARRAYSIZE];
+ float caloJetTime_t_60ps_func[GENJETARRAYSIZE];
+ float caloJetTime_t_100ps_func[GENJETARRAYSIZE];
+ float caloJetEsum_t[GENJETARRAYSIZE];
+
 
  //ak4 jet info
  int nGenak4Jets;

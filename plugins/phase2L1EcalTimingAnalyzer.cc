@@ -31,6 +31,7 @@
 //
 phase2L1EcalTimingAnalyzer::phase2L1EcalTimingAnalyzer(const edm::ParameterSet& cfg):
   ecalTPGBToken_(   consumes<EcalEBTrigPrimDigiCollection>(cfg.getParameter<edm::InputTag>("ecalTPGsBarrel"))),
+  caloJetTag_ ((        cfg.getParameter<edm::InputTag>( "caloJets"))),
   genSrcak4J_ ((        cfg.getParameter<edm::InputTag>( "ak4GenJets"))),
   genSrcak4JN_ ((        cfg.getParameter<edm::InputTag>( "ak4GenJetsNoNu"))),
   genSrcak8J_ ((        cfg.getParameter<edm::InputTag>( "ak8GenJets"))),
@@ -46,7 +47,8 @@ phase2L1EcalTimingAnalyzer::phase2L1EcalTimingAnalyzer(const edm::ParameterSet& 
   genak8JetNoNuToken_ =     consumes<std::vector<reco::GenJet> >(genSrcak8JN_);
   genToken_ =     consumes<std::vector<reco::GenParticle> >(genSrc_);
   genTokenT_ =     consumes<float>(genSrcT_);
-  
+  caloJetToken_ =     consumes<l1t::JetBxCollection>(caloJetTag_);
+
   edm::Service<TFileService> fs;
   ecalTPTree = fs->make<TTree>("ecalTPTree", "Crystal cluster individual crystal pt values");
 }
@@ -66,6 +68,12 @@ void phase2L1EcalTimingAnalyzer::loadEvent(const edm::Event& iEvent){
 
   //control plot for ecal crystals
   iEvent.getByToken( ecalTPGBToken_, ecaltpgCollection);
+
+  if(!iEvent.getByToken(caloJetToken_,caloJetHandle))
+    std::cout<<"calo jets Found "<<std::endl;
+  else{
+    //std::cout<<"calo Jets size "<<caloJetHandle->size()<<std::endl;
+  }
 
   if(!iEvent.getByToken(genak4JetToken_,genak4JetHandle))
     std::cout<<"No gen ak4 jets Found "<<std::endl;
@@ -112,9 +120,11 @@ void phase2L1EcalTimingAnalyzer::setBranches(){
   //enableEBCrystalBranches();
   enableGenParticleBranches();
   //enableGenak4JetBranches();
-  enableGenak4JetNoNuBranches();
+  //enableGenak4JetNoNuBranches();
   //enableGenak8JetBranches();
   //enableGenak8JetNoNuBranches();
+  enableCaloJetBranches();
+
 };
 
 void phase2L1EcalTimingAnalyzer::enableEventInfoBranches(){
@@ -288,38 +298,25 @@ void phase2L1EcalTimingAnalyzer::enableGenParticleBranches(){
 
 };
 
-void phase2L1EcalTimingAnalyzer::enableGenak4JetBranches(){
+void phase2L1EcalTimingAnalyzer::enableCaloJetBranches(){
  //jet info
- ecalTPTree->Branch("nGenak4Jets", &nGenak4Jets, "nGenak4Jets/I");
 
- ecalTPTree->Branch("gak4JetMass", &gak4JetMass, "gak4JetMass[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetE", &gak4JetE, "gak4JetE[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetEt", &gak4JetEt, "gak4JetEt[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetPt", &gak4JetPt, "gak4JetPt[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetPx", &gak4JetPx, "gak4JetPx[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetPy", &gak4JetPy, "gak4JetPy[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetPz", &gak4JetPz, "gak4JetPz[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetEta", &gak4JetEta, "gak4JetEta[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetPhi", &gak4JetPhi, "gak4JetPhi[nGenak4Jets]/F");
-
- ecalTPTree->Branch("gak4JetArea", &gak4JetArea, "gak4JetArea[nGenak4Jets]/F");
-
- ecalTPTree->Branch("gak4JetPileupE", &gak4JetPileupE, "gak4JetPileupE[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetPileupIdFlag", &gak4JetPileupIdFlag, "gak4JetPileupIdFlag[nGenak4Jets]/I");
-
- ecalTPTree->Branch("gak4JetPassIdLoose", &gak4JetPassIdLoose, "gak4JetPassIdLoose[nGenak4Jets]/O");
- ecalTPTree->Branch("gak4JetPassIdTight", &gak4JetPassIdTight, "gak4JetPassIdTight[nGenak4Jets]/O");
-
-
- ecalTPTree->Branch("gak4JetMuEnergy", &gak4JetMuEnergy, "gak4JetMuEnergy[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetEmEnergy", &gak4JetEmEnergy, "gak4JetEmEnergy[nGenak4Jets]/F");
- //ecalTPTree->Branch("gak4JetChargedEmEnergy", &gak4JetChargedEmEnergy, "gak4JetChargedEmEnergy[nGenak4Jets]/F");
- //ecalTPTree->Branch("gak4JetNeutralEmEnergy", &gak4JetNeutralEmEnergy, "gak4JetNeutralEmEnergy[nGenak4Jets]/F");
- ecalTPTree->Branch("gak4JetHadronEnergy", &gak4JetHadronEnergy, "gak4JetHadronEnergy[nGenak4Jets]/F");
- //ecalTPTree->Branch("gak4JetChargedHadronEnergy", &gak4JetChargedHadronEnergy, "gak4JetChargedHadronEnergy[nGenak4Jets]/F");
- //ecalTPTree->Branch("gak4JetNeutralHadronEnergy", &gak4JetNeutralHadronEnergy, "gak4JetNeutralHadronEnergy[nGenak4Jets]/F");
+ ecalTPTree->Branch("nCaloJets", &nCaloJets, "nCaloJets/I");
+ ecalTPTree->Branch("caloJetE", &caloJetE, "caloJetE[nCaloJets]/F");
+ ecalTPTree->Branch("caloJetPt", &caloJetPt, "caloJetPt[nCaloJets]/F");
+ ecalTPTree->Branch("caloJetEta", &caloJetEta, "caloJetEta[nCaloJets]/F");
+ ecalTPTree->Branch("caloJetPhi", &caloJetPhi, "caloJetPhi[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetTime", &caloJetTime, "CaloJetTime[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetEsum", &caloJetEsum, "CaloJetEsum[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetTime_t", &caloJetTime_t, "CaloJetTime_t[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetTime_t_60ps", &caloJetTime_t_60ps, "CaloJetTime_t_60ps[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetTime_t_100ps", &caloJetTime_t_100ps, "CaloJetTime_t_100ps[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetTime_t_60ps_func", &caloJetTime_t_60ps_func, "CaloJetTime_t_60ps_func[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetTime_t_100ps_func", &caloJetTime_t_100ps_func, "CaloJetTime_t_100ps_func[nCaloJets]/F");
+ ecalTPTree->Branch("CaloJetEsum_t", &caloJetEsum_t, "CaloJetEsum_t[nCaloJets]/F");
 
 };
+
 
 void phase2L1EcalTimingAnalyzer::enableGenak4JetNoNuBranches(){
  //jet info
@@ -374,6 +371,9 @@ void phase2L1EcalTimingAnalyzer::enableGenak4JetNoNuBranches(){
  //ecalTPTree->Branch("gak4JetNoNuNeutralHadronEnergy", &gak4JetNoNuNeutralHadronEnergy, "gak4JetNoNuNeutralHadronEnergy[nGenak4JetNoNus]/F");
 
 };
+
+
+
 
 void phase2L1EcalTimingAnalyzer::enableGenak8JetBranches(){
  //jet info
@@ -451,6 +451,23 @@ void phase2L1EcalTimingAnalyzer::resetBranches(){
   resetGenak4JetNoNuBranches();
   resetGenak8JetBranches();
   resetGenak8JetNoNuBranches();
+
+  nCaloJets = 0;
+  for(int i=0; i<GENJETARRAYSIZE; i++){
+    caloJetTime[i] = -666.;
+    caloJetEsum[i] = -666.;
+    caloJetTime_t[i] = -666.;
+    caloJetTime_t_60ps[i] = -666.;
+    caloJetTime_t_100ps[i] = -666.;
+    caloJetTime_t_60ps_func[i] = -666.;
+    caloJetTime_t_100ps_func[i] = -666.;
+    caloJetEsum_t[i] = -666.;
+    caloJetE[i]    = -666.;
+    caloJetPt[i]   = -666.;
+    caloJetEta[i]  = -666.;
+    caloJetPhi[i]  = -666.;
+  }
+
 };
 
 void phase2L1EcalTimingAnalyzer::resetEventInfoBranches(){
@@ -1959,6 +1976,185 @@ bool phase2L1EcalTimingAnalyzer::fillGenak4JetNoNuBranches(){
   return true;
 };
 
+
+
+bool phase2L1EcalTimingAnalyzer::fillCaloJetBranches(){
+
+  std::vector<reco::GenParticle>  genParticles = phase2L1EcalTimingAnalyzer::GetGenParticles();
+
+  //ak4 nonu gen jet info
+  //nGenak4JetNoNus = genJetHandle->size();
+  for(const l1t::Jet &jet : *caloJetHandle){
+	nCaloJets++;
+
+	caloJetE[nCaloJets-1] = jet.energy();
+	caloJetPt[nCaloJets-1] = jet.pt();
+	caloJetEta[nCaloJets-1] = jet.eta();
+	caloJetPhi[nCaloJets-1] = jet.phi();
+
+	float Edep = 0.;
+	float Edep_sum = 0.;
+	float Edep_sum_temp = 0.;
+	float jet_time_temp = 0.;
+	float jet_time_temp_60ps = 0.;
+	float jet_time_temp_100ps = 0.;
+	float jet_time_temp_60ps_func = 0.;
+	float jet_time_temp_100ps_func = 0.;
+	float Edep_sum_temp0p5 = 0.;
+	float jet_time_temp0p5 = 0.;
+	float Edep_sum_temp1 = 0.;
+	float jet_time_temp1 = 0.;
+	float Edep_sum_temp2 = 0.;
+	float jet_time_temp2 = 0.;
+	float Edep_sum_temp3 = 0.;
+	float jet_time_temp3 = 0.;
+	float Edep_sum_temp5 = 0.;
+	float jet_time_temp5 = 0.;
+	float Edep_sum_temp10 = 0.;
+	float jet_time_temp10 = 0.;
+
+	for(unsigned int k=0; k<61200; k++){
+		float eb_eta = eb_cell_Eta[k];
+		float eb_phi = eb_cell_Phi[k];
+		float deltaR_eb_jet = deltaR(eb_eta, eb_phi, jet.eta(), jet.phi()); 
+
+		if(eb_Et[k]!=-666 ) Edep = eb_Edep[k];
+		else Edep = 0.;
+
+		//find cells within cone 0.4
+		if(deltaR_eb_jet < 0.4 ){
+			Edep_sum += Edep;
+			if(gen_time_tp[k]!=-666)
+			{
+
+			  //cout << "TP " << Edep << " : " << gen_time_tp[k] << "\n";
+			  
+				Edep_sum_temp += Edep;
+				jet_time_temp += gen_time_tp[k]*Edep;
+				jet_time_temp_60ps += gen_time_tp_60ps[k]*Edep;
+				jet_time_temp_100ps += gen_time_tp_100ps[k]*Edep;
+				jet_time_temp_60ps_func += gen_time_tp_60ps_func[k]*Edep;
+				jet_time_temp_100ps_func += gen_time_tp_100ps_func[k]*Edep;
+				//if(Edep!=0) std::cout<<"in loop TP sum E" << Edep_sum<<"TP time temp"<<jet_time_temp <<" Edep "<< Edep<< std::endl;
+				if(Edep>0.5)
+				{
+					Edep_sum_temp0p5 += Edep;
+					jet_time_temp0p5 += gen_time_tp[k]*Edep;
+				if(Edep>1)
+				{
+					Edep_sum_temp1 += Edep;
+					jet_time_temp1 += gen_time_tp[k]*Edep;
+				if(Edep>2)
+				{
+					Edep_sum_temp2 += Edep;
+					jet_time_temp2 += gen_time_tp[k]*Edep;
+				if(Edep>3)
+				{
+					Edep_sum_temp3 += Edep;
+					jet_time_temp3 += gen_time_tp[k]*Edep;
+				if(Edep>5)
+				{
+					Edep_sum_temp5 += Edep;
+					jet_time_temp5 += gen_time_tp[k]*Edep;
+				if(Edep>10)
+				{
+					Edep_sum_temp10 += Edep;
+					jet_time_temp10 += gen_time_tp[k]*Edep;
+				}//10
+				}//5
+				}//3
+				}//2
+				}//1
+				}//0.5
+			}
+		}//0.4
+		
+	}//loop of TP
+
+	//cout << "jet time: " << jet_time_temp/Edep_sum << " | Esum = " << Edep_sum << "\n";
+
+	float jet_time = jet_time_temp/Edep_sum;
+	caloJetTime[nCaloJets-1] = jet_time;	
+	caloJetEsum[nCaloJets-1] = Edep_sum;	
+
+	float jet_time_t = jet_time_temp/Edep_sum_temp;
+	caloJetTime_t[nCaloJets-1] = jet_time_t;	
+	caloJetEsum_t[nCaloJets-1] = Edep_sum_temp;	
+
+	float jet_time_t_60ps = jet_time_temp_60ps/Edep_sum_temp;
+	float jet_time_t_100ps = jet_time_temp_100ps/Edep_sum_temp;
+	float jet_time_t_60ps_func = jet_time_temp_60ps_func/Edep_sum_temp;
+	float jet_time_t_100ps_func = jet_time_temp_100ps_func/Edep_sum_temp;
+	caloJetTime_t_60ps[nCaloJets-1] = jet_time_t_60ps;	
+	caloJetTime_t_100ps[nCaloJets-1] = jet_time_t_100ps;	
+	caloJetTime_t_60ps_func[nCaloJets-1] = jet_time_t_60ps_func;	
+	caloJetTime_t_100ps_func[nCaloJets-1] = jet_time_t_100ps_func;	
+
+
+	//*************************************************************
+	// Debugging Code Below
+	//*************************************************************
+	if (Edep_sum_temp <= 0 && abs(jet.eta()) < 1.5) {
+	  cout << "\n\n";
+	  cout << "Jet has no time stamp : " << jet.energy() << " " << jet.pt() << " " << jet.eta() << " " << jet.phi() << "\n";
+	  cout << "ECAL TPs\n";
+	  
+	  for(unsigned int k=0; k<61200; k++){
+	    if (eb_Edep[k] == -666) continue;
+
+	    float eb_eta = eb_cell_Eta[k];
+	    float eb_phi = eb_cell_Phi[k];
+	    float deltaR_eb_jet = deltaR(eb_eta, eb_phi, jet.eta(), jet.phi()); 
+
+	    //find cells within cone 0.4
+	    if(deltaR_eb_jet < 0.4 ){
+	      cout << "TP " << k << " : " << eb_eta << " " <<  eb_phi << " | " << deltaR_eb_jet << " | " << eb_Edep[k] << "\n";	   		
+
+	      for(unsigned int i = 0; i< genParticles.size(); i++){
+		reco::GenParticle gen = genParticles[i];
+		
+		//gammas and pi0s in ecal barrel
+		if( deltaR(genParticles[i].eta(), genParticles[i].phi(), eb_eta , eb_phi ) < 0.05
+		    && ((abs(gen.pdgId())==22 || abs(gen.pdgId())==111) || gen.status() == 1)
+		    ) {
+		  cout << "nearby particle: " << gen.pdgId() << " | " << deltaR(genParticles[i].eta(), genParticles[i].phi(), eb_eta , eb_phi ) << " | "
+		       << gen.pt() << " " << gen.eta() << " " << gen.phi()
+		       << "\n";
+		}
+		
+	      }
+
+	      cout << "\n";
+	    }
+	  }//loop of TP
+	 
+	  cout << "\nPi0's nearby\n";	  
+	  for(unsigned int i = 0; i< genParticles.size(); i++){
+	    reco::GenParticle gen = genParticles[i];
+
+	    //gammas and pi0s in ecal barrel
+	    if( deltaR(genParticles[i].eta(), genParticles[i].phi(), jet.eta() , jet.phi() ) < 0.6
+		&& (abs(gen.pdgId())==22 || abs(gen.pdgId())==111)
+		) {
+	      cout << "particle: " << gen.pdgId() << " | " << deltaR(genParticles[i].eta(), genParticles[i].phi(), jet.eta() , jet.phi() ) << " | "
+		   << gen.pt() << " " << gen.eta() << " " << gen.phi()
+		   << "\n";
+	    }
+	    
+	  } //loop over gen particles
+	} //if it's a jet with no timestamp
+
+
+
+
+  } //loop over calojets
+
+  return true;
+};
+
+
+
+
 bool phase2L1EcalTimingAnalyzer::fillGenak8JetBranches(){
 
   //ak8 gen jet info
@@ -2121,19 +2317,20 @@ phase2L1EcalTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSe
   //fill branches
   // fill event info
   fillEventInfoBranches(iEvent);
-  std::cout<<"Finished  fill event info"<<std::endl;
+  //std::cout<<"Finished  fill event info"<<std::endl;
   //fill gen info
   fillGenParticleBranches();
-  std::cout<<"Finished  fill gen particles"<<std::endl;
+  //std::cout<<"Finished  fill gen particles"<<std::endl;
   //ecal barrel crystals
   fillEBCrystalBranches(iEvent, iSetup);
   //fillEBCrystalBranches(iEvent, iSetup, genParticles);
-  std::cout<<"Finished  fill ecal barrel crystals"<<std::endl;
+  //std::cout<<"Finished  fill ecal barrel crystals"<<std::endl;
   //fill jet info
   //fillGenak4JetBranches();
-  fillGenak4JetNoNuBranches();
+  //fillGenak4JetNoNuBranches();
   //fillGenak8JetBranches();
   //fillGenak8JetNoNuBranches();
+  fillCaloJetBranches();
 
   ecalTPTree->Fill();
   std::cout<<"Finished Analyzing"<<std::endl;
