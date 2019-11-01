@@ -78,6 +78,7 @@ process.load('CalibCalorimetry.CaloTPG.CaloTPGTranscoder_cfi')
 process.load("L1Trigger.phase2L1EcalTimingTP.phase2L1EcalTimingAnalyzer_cfi")
 
 process.L1EcalTimingAnalyzer = cms.EDAnalyzer('phase2L1EcalTimingAnalyzer',
+                                       caloJets = cms.InputTag("L1CaloJetProducer", "L1CaloJetCollectionBXV"),
                                        ak4GenJets = cms.InputTag("ak4GenJets", "", "HLT"),
                                        ak4GenJetsNoNu = cms.InputTag("ak4GenJetsNoNu", "", "HLT"),
                                        ak8GenJets = cms.InputTag("ak8GenJets", "", "HLT"),
